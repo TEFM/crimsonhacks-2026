@@ -103,6 +103,28 @@ React + Vite is the preferred frontend because it is quick to build, easy to dem
 
 Start with a frontend-only app using seeded bill fixtures. Add a Node.js serverless function/API only for AI translation, private API tokens, or live-data transformation. Do not build a separate always-running Express server during the hackathon unless the team already has it working.
 
+### MVC structure
+
+Organize the application using an MVC-style structure to keep presentation, data, and user actions separate:
+
+- **Model:** Bill, vote, meeting, fiscal-note, and historical-effect data; data-access services; and Node.js functions that retrieve or transform Utah Legislature/API data.
+- **View:** React pages and presentational components, including the dashboard, bill-detail page, meeting cards, voting timeline, translator cards, and simulator UI.
+- **Controller:** React hooks/page controllers and Node.js API handlers that respond to user actions, validate inputs, call model services, and supply data to views.
+
+Suggested project layout:
+
+```text
+src/
+  models/          # Types, fixtures, and data services
+  controllers/     # UI/action logic and API client orchestration
+  views/           # Pages and presentational React components
+  components/      # Reusable UI elements
+  services/        # Shared API/AI/source-link helpers
+amplify/           # Optional Node.js serverless functions and Amplify backend
+```
+
+For speed, keep the controller layer lightweight: do not bury basic component state in abstractions, but keep fetching, translation requests, and business rules outside display-only components.
+
 ### AWS Amplify deployment requirement
 
 The app must be deployable as a public website through **AWS Amplify Hosting**. Keep the initial architecture simple and deployment-safe:
