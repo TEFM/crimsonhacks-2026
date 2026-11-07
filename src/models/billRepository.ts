@@ -1,12 +1,18 @@
-import { bills } from './bills.js';
+import { bills, type Bill, type BillSeed } from './bills.js';
+
+type UnknownRecord = Record<string, unknown>;
 
 const BILL_ID_PATTERN = /^(HB|SB)\s+\d+$/;
 
-function isNonEmptyString(value) {
+function isRecord(value: unknown): value is UnknownRecord {
+  return Boolean(value) && typeof value === 'object';
+}
+
+function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0;
 }
 
-function safeUrl(value) {
+function safeUrl(value: unknown): string | null {
   if (!isNonEmptyString(value)) return null;
 
   try {
@@ -17,7 +23,7 @@ function safeUrl(value) {
   }
 }
 
-function decodeBillId(value) {
+function decodeBillId(value: unknown): string {
   if (typeof value !== 'string') return '';
   try {
     return decodeURIComponent(value).trim().toUpperCase();
@@ -26,11 +32,11 @@ function decodeBillId(value) {
   }
 }
 
-function textOr(value, fallback) {
+function textOr(value: unknown, fallback: string): string {
   return isNonEmptyString(value) ? value.trim() : fallback;
 }
 
-function normalizeExplanation(value) {
+function normalizeExplanation(value: unknown): Bill['explanation'] {
   if (isNonEmptyString(value)) return {
     plainSummary: value.trim(),
     currentVsProposed: 'This cached fixture does not establish a verified current-law comparison.',
@@ -38,7 +44,7 @@ function normalizeExplanation(value) {
     effectiveDate: 'Effective date unavailable in this fixture.',
     uncertainties: 'This AI-assisted demo explanation is not legal or financial advice. Verify official records.'
   };
-  if (!value || typeof value !== 'object') return null;
+  if (!isRecord(value)) return null;
   return {
     plainSummary: textOr(value.plainSummary, 'A plain-language explanation is not available.'),
     currentVsProposed: textOr(value.currentVsProposed, 'A current-law comparison is not available.'),
@@ -48,17 +54,17 @@ function normalizeExplanation(value) {
   };
 }
 
-function normalizePersonas(value) {
-  if (!value || typeof value !== 'object') return {};
-  return Object.fromEntries(Object.entries(value).filter(([, detail]) => isNonEmptyString(detail)).map(([name, detail]) => [name, detail.trim()]));
+function normalizePersonas(value: unknown): Record<string, string> {
+  if (!isRecord(value)) return {};
+  return Object.fromEntries(Object.entries(value).flatMap(([name, detail]) => isNonEmptyString(detail) ? [[name, detail.trim()]] : []));
 }
 
 /**
  * Converts untrusted fixture or API data into the small shape our views can use.
  * Invalid records are excluded instead of being rendered as authoritative data.
  */
-export function normalizeBill(record) {
-  if (!record || typeof record !== 'object') return null;
+export function normalizeBill(record: unknown): Bill | null {
+  if (!isRecord(record)) return null;
 
   const id = isNonEmptyString(record.id) ? record.id.trim().toUpperCase() : '';
   if (!BILL_ID_PATTERN.test(id) || !isNonEmptyString(record.title) || !isNonEmptyString(record.topic)) {
@@ -82,11 +88,14 @@ export function normalizeBill(record) {
     sourceStatus: isNonEmptyString(record.sourceStatus) ? record.sourceStatus.trim() : 'Cached demo fixture',
     explanation: normalizeExplanation(record.explanation),
     personas: normalizePersonas(record.personas),
-    timeline: Array.isArray(record.timeline) ? record.timeline.filter((item) => item && typeof item === 'object' && isNonEmptyString(item.label) && isNonEmptyString(item.detail)).map((item) => ({ label: item.label.trim(), detail: item.detail.trim(), date: textOr(item.date, 'Date unavailable') })) : [],
-    historicalEffect: record.historicalEffect && typeof record.historicalEffect === 'object' ? { title: textOr(record.historicalEffect.title, 'Related prior bill'), detail: textOr(record.historicalEffect.detail, 'No verified comparison is available.'), sourceUrl: safeUrl(record.historicalEffect.sourceUrl) } : null,
-    simulator: record.simulator && typeof record.simulator === 'object' && Number.isFinite(record.simulator.annualProgramCost) && Number.isFinite(record.simulator.affectedHouseholds) && record.simulator.affectedHouseholds > 0 ? { annualProgramCost: record.simulator.annualProgramCost, affectedHouseholds: record.simulator.affectedHouseholds, assumptions: textOr(record.simulator.assumptions, 'Illustrative inputs only.') } : null,
+    timeline: Array.isArray(record.timeline) ? record.timeline.filter(isRecord).flatMap((item) => {
+      if (!isNonEmptyString(item.label) || !isNonEmptyString(item.detail)) return [];
+      return [{ label: item.label.trim(), detail: item.detail.trim(), date: textOr(item.date, 'Date unavailable') }];
+    }) : [],
+    historicalEffect: isRecord(record.historicalEffect) ? { title: textOr(record.historicalEffect.title, 'Related prior bill'), detail: textOr(record.historicalEffect.detail, 'No verified comparison is available.'), sourceUrl: safeUrl(record.historicalEffect.sourceUrl) } : null,
+    simulator: isRecord(record.simulator) && Number.isFinite(record.simulator.annualProgramCost) && Number.isFinite(record.simulator.affectedHouseholds) && typeof record.simulator.annualProgramCost === 'number' && typeof record.simulator.affectedHouseholds === 'number' && record.simulator.affectedHouseholds > 0 ? { annualProgramCost: record.simulator.annualProgramCost, affectedHouseholds: record.simulator.affectedHouseholds, assumptions: textOr(record.simulator.assumptions, 'Illustrative inputs only.') } : null,
     uncertainty: isNonEmptyString(record.uncertainty) ? record.uncertainty.trim() : null,
-    fiscalNote: record.fiscalNote && typeof record.fiscalNote === 'object' ? {
+    fiscalNote: isRecord(record.fiscalNote) ? {
       stateCost: isNonEmptyString(record.fiscalNote.stateCost) ? record.fiscalNote.stateCost.trim() : 'Not available',
       localCost: isNonEmptyString(record.fiscalNote.localCost) ? record.fiscalNote.localCost.trim() : 'Not available',
       sourceUrl: safeUrl(record.fiscalNote.sourceUrl)
@@ -94,8 +103,8 @@ export function normalizeBill(record) {
   };
 }
 
-export function createBillRepository(records = bills) {
-  const validBills = records.map(normalizeBill).filter(Boolean);
+export function createBillRepository(records: readonly (BillSeed | unknown)[] = bills) {
+  const validBills = records.map(normalizeBill).filter((bill): bill is Bill => bill !== null);
 
   return {
     list({ topic = 'All bills', query = '' } = {}) {
@@ -106,7 +115,7 @@ export function createBillRepository(records = bills) {
         return matchesTopic && (!normalizedQuery || searchable.includes(normalizedQuery));
       });
     },
-    findById(id) {
+    findById(id: unknown): Bill | null {
       const normalizedId = decodeBillId(id);
       return validBills.find((bill) => bill.id === normalizedId) ?? null;
     }

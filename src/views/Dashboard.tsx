@@ -1,4 +1,5 @@
 import { meetings } from '../models/bills';
+import type { BillSeed, Meeting } from '../models/bills';
 import { useDashboard } from '../controllers/useDashboard';
 
 function Mark() {
@@ -13,25 +14,25 @@ function ArrowIcon() {
   return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13" /><path d="m13 6 6 6-6 6" /></svg>;
 }
 
-function BillCard({ bill }) {
+function BillCard({ bill }: { bill: BillSeed }) {
   return (
     <article className="bill-card">
       <div className="bill-topline">
         <span className="bill-id">{bill.id}</span>
-        <span className={`status ${bill.statusTone}`}>{bill.status}</span>
+        <span className={`status ${bill.statusTone ?? 'blue'}`}>{bill.status ?? 'Status unavailable'}</span>
       </div>
       <h3>{bill.title}</h3>
-      <p>{bill.summary}</p>
+      <p>{bill.summary ?? 'A plain-language summary is not available.'}</p>
       <div className="bill-footer">
-        <div className="sponsor"><span className="avatar">{bill.initials}</span><span>{bill.sponsor}</span></div>
+        <div className="sponsor"><span className="avatar">{bill.initials ?? '--'}</span><span>{bill.sponsor ?? 'Sponsor not available'}</span></div>
         <button className="card-link" type="button">View brief <ArrowIcon /></button>
       </div>
-      <div className="bill-meta"><span>{bill.hearing}</span><span>{bill.votes}</span></div>
+      <div className="bill-meta"><span>{bill.hearing ?? 'No upcoming meeting listed'}</span><span>{bill.votes ?? 'Vote information unavailable'}</span></div>
     </article>
   );
 }
 
-function MeetingCard({ meeting }) {
+function MeetingCard({ meeting }: { meeting: Meeting }) {
   return (
     <div className={`meeting ${meeting.active ? 'meeting-active' : ''}`}>
       <div className="meeting-time"><strong>{meeting.time}</strong><span>{meeting.meridiem}</span></div>

@@ -1,28 +1,35 @@
 import { billRepository } from '../src/models/billRepository.js';
 import { createOfficialRepository, createUtahLegislatureClient } from '../src/models/utahLegislatureClient.js';
 
+interface LambdaEvent {
+  pathParameters?: { id?: string | null } | null;
+  rawPath?: string;
+  queryStringParameters?: Record<string, string | undefined> | null;
+  requestContext?: { http?: { method?: string } };
+}
+
 const headers = {
   'content-type': 'application/json; charset=utf-8',
   'cache-control': 'public, max-age=300',
   'access-control-allow-origin': '*'
 };
 
-function response(statusCode, body) {
+function response(statusCode: number, body: unknown) {
   return { statusCode, headers, body: JSON.stringify(body) };
 }
 
-function requestedBillId(event) {
+function requestedBillId(event: LambdaEvent): string | null {
   const pathParameter = event?.pathParameters?.id;
   if (pathParameter) return pathParameter;
   const parts = typeof event?.rawPath === 'string' ? event.rawPath.split('/').filter(Boolean) : [];
-  return parts.length > 2 ? parts.at(-1) : null;
+  return parts.length > 2 ? parts.at(-1) ?? null : null;
 }
 
 /** AWS Lambda-compatible read-only bills endpoint.
  * GET /api/bills?topic=Housing&query=home
  * GET /api/bills/{id}
  */
-export async function handler(event = {}) {
+export async function handler(event: LambdaEvent = {}) {
   if (event.requestContext?.http?.method && event.requestContext.http.method !== 'GET') {
     return response(405, { error: 'Only GET is supported.' });
   }

@@ -1,9 +1,52 @@
-export const topics = ['All bills', 'Housing', 'Water', 'Education', 'Transportation', 'Public safety'];
+export interface FiscalNote {
+  stateCost: string;
+  localCost: string;
+  sourceUrl: string | null;
+}
+
+export interface Bill {
+  id: string;
+  title: string;
+  topic: string;
+  sponsor: string;
+  status: string;
+  statusTone: string;
+  summary: string;
+  hearing: string;
+  updated: string;
+  votes: string;
+  initials: string;
+  officialSourceUrl: string | null;
+  officialTextUrl: string | null;
+  sourceStatus: string;
+  explanation: { plainSummary: string; currentVsProposed: string; affectedGroups: string; effectiveDate: string; uncertainties: string } | null;
+  personas: Record<string, string>;
+  timeline: Array<{ label: string; detail: string; date: string }>;
+  historicalEffect: { title: string; detail: string; sourceUrl: string | null } | null;
+  simulator: { annualProgramCost: number; affectedHouseholds: number; assumptions: string } | null;
+  uncertainty: string | null;
+  fiscalNote: FiscalNote | null;
+}
+
+export type BillSeed = Omit<Partial<Bill>, 'explanation'> & Pick<Bill, 'id' | 'title' | 'topic'> & {
+  explanation?: Bill['explanation'] | string;
+};
+
+export interface Meeting {
+  time: string;
+  meridiem: string;
+  committee: string;
+  item: string;
+  room: string;
+  active?: boolean;
+}
+
+export const topics = ['All bills', 'Housing', 'Water', 'Education', 'Transportation', 'Public safety'] as const;
 
 const fixtureSource = 'Cached demo fixture — official links pending verification';
 const unavailableFiscalNote = { stateCost: 'Not available', localCost: 'Not available', sourceUrl: null };
 
-export const bills = [
+export const bills: BillSeed[] = [
   {
     id: 'HB 218', title: 'Starter Home Availability Amendments', topic: 'Housing', sponsor: 'Rep. A. Morales',
     status: 'In committee', statusTone: 'amber',
@@ -50,7 +93,7 @@ export const bills = [
   { id: 'SB 203', title: 'Water Infrastructure Planning', topic: 'Water', sponsor: 'Sen. D. Larsen', status: 'New', statusTone: 'green', summary: 'A proposed water-planning update included as a cached demonstration record.', hearing: 'Natural Resources Committee · Next week', updated: 'Cached demo fixture', votes: 'Awaiting committee vote', initials: 'DL', sourceStatus: fixtureSource, explanation: 'This proposed measure is represented only by demo data. Read official bill text before relying on it.', fiscalNote: unavailableFiscalNote }
 ];
 
-export const meetings = [
+export const meetings: Meeting[] = [
   { time: '9:00', meridiem: 'AM', committee: 'Land Use Committee', item: 'HB 218 · Starter Home Availability', room: 'Room 445', active: true },
   { time: '11:30', meridiem: 'AM', committee: 'Natural Resources Committee', item: 'SB 142 · Waterwise Communities', room: 'Room 210' },
   { time: '2:00', meridiem: 'PM', committee: 'Education Committee', item: 'HB 301 · Innovation Grants', room: 'Room 30' }

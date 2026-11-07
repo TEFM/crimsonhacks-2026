@@ -19,3 +19,7 @@ test('filterBills searches bill fields without regard to case', () => {
 test('filterBills returns no results when a query has no match', () => {
   assert.deepEqual(filterBills(sampleBills, 'All bills', 'education'), []);
 });
+
+test('filterBills treats a malformed query as an empty search', () => {
+  assert.deepEqual(filterBills(sampleBills, 'All bills', null as unknown as string), sampleBills);
+});
