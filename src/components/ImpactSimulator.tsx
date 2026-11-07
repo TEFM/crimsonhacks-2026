@@ -39,10 +39,10 @@ function LocalImpactSimulator({ bill }: { bill: Bill }) {
         <strong>{formatCurrency(annualImpact)}<small> per household / year</small></strong>
         </>}
       </div>
-      {annualImpact !== null && householdCount !== null && <p className="simulator-calculation">{formatCurrency(simulator.annualProgramCost)} ÷ {householdCount.toLocaleString('en-US')} households = {formatCurrency(annualImpact)} per household each year</p>}
+      {annualImpact !== null && householdCount !== null && <p className="simulator-calculation">{formatCurrency(simulator.annualProgramCost)} / {householdCount.toLocaleString('en-US')} households = {formatCurrency(annualImpact)} per household each year</p>}
     </>}
     <div className="simulator-assumptions"><strong>Assumptions & uncertainty</strong><p>{assumptions}</p></div>
-    <p className="disclaimer">Illustrative estimate—not a prediction or financial advice. Actual costs, funding sources, participation, and household effects may differ.</p>
+    <p className="disclaimer">Illustrative estimate - not a prediction or financial advice. Actual costs, funding sources, participation, and household effects may differ.</p>
     {fiscalSource ? <a className="source-link" href={fiscalSource} target="_blank" rel="noreferrer">Review official sources for fiscal notes <ArrowIcon /></a> : <p className="simulator-empty">Fiscal-note source unavailable.</p>}
   </section>;
 }

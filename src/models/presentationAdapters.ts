@@ -135,7 +135,7 @@ export function toMeetingViewModel(meeting: BackendMeeting, index: number): Meet
     ? 'house-land-use-feb-10-2026'
     : `${committee.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}-${index + 1}`;
   const item = text(seed.item);
-  const [itemId, ...itemTitle] = item.split(' · ');
+  const [itemId, ...itemTitle] = item.split(' - ');
   return {
     id: slug,
     slug,
@@ -145,7 +145,7 @@ export function toMeetingViewModel(meeting: BackendMeeting, index: number): Meet
     body: 'Legislative committee',
     room: text(seed.room) || undefined,
     timing: active ? 'today' : 'upcoming',
-    scheduledBills: itemId ? [{ id: itemId, title: itemTitle.join(' · ') || item, billSlug: /^(HB|SB) \d+$/.test(itemId) ? slugifyBillId(itemId) : undefined }] : [],
+    scheduledBills: itemId ? [{ id: itemId, title: itemTitle.join(' - ') || item, billSlug: /^(HB|SB) \d+$/.test(itemId) ? slugifyBillId(itemId) : undefined }] : [],
     agendaSourceUrl: OFFICIAL_UTAH_LEGISLATURE_URL,
     sourceLabel: 'Official Utah Legislature source (fixture link)'
   };

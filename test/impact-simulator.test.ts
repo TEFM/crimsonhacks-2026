@@ -42,7 +42,7 @@ test('the simulator renders an accessible editable count, reset, inputs, formula
   assert.match(html, /aria-describedby="simulator-input-help"/);
   assert.match(html, /Reset scenario/);
   assert.match(html, /Annual program cost \(fixed\)/);
-  assert.match(html, /\$1,200,000 ÷ 50,000 households = \$24/);
+  assert.match(html, /\$1,200,000 \/ 50,000 households = \$24/);
   assert.match(html, /role="status"/);
   assert.match(html, /Hypothetical inputs/);
   assert.match(html, /not official fiscal figures/);
@@ -57,7 +57,7 @@ test('missing and invalid fixture inputs render a safe unavailable state with di
     const html = renderSimulator(simulator);
     assert.match(html, /An estimate is unavailable/);
     assert.doesNotMatch(html, /type="number"/);
-    assert.doesNotMatch(html, /\$NaN|\$∞|\$Infinity/);
+    assert.doesNotMatch(html, /\$NaN|\$Infinity/);
     assert.match(html, /Assumptions &amp; uncertainty/);
     assert.match(html, /not a prediction or financial advice/);
     assert.match(html, /Review official sources for fiscal notes/);

@@ -32,7 +32,7 @@ test('effective date displays fixture timing safely and clearly labels it as unv
   const markup = renderToStaticMarkup(createElement(EffectiveDate, { value: '<script>untrusted date</script>' }));
   assert.match(markup, /&lt;script&gt;untrusted date&lt;\/script&gt;/);
   assert.doesNotMatch(markup, /<script>/);
-  assert.match(markup, /EFFECTIVE DATE · DEMO EXPLANATION/);
+  assert.match(markup, /EFFECTIVE DATE - DEMO EXPLANATION/);
   assert.match(markup, /fixture-derived and has not been verified/);
 });
 

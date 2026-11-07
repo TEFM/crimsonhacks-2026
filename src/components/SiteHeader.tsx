@@ -17,6 +17,5 @@ export function SiteHeader({ activePage = 'Dashboard' }: { activePage?: string }
       <img className="state-flag" src={utahStateFlag} alt="Utah state flag" />
     </div>
     <nav aria-label="Main navigation">{navItems.map((item) => <a className={activePage === item.label ? 'active' : ''} href={item.href} key={item.label}>{item.label}</a>)}</nav>
-    <button className="location" type="button"><span className="pin">⌖</span> Salt Lake County <span className="chevron">⌄</span></button>
   </header>;
 }

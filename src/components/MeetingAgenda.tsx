@@ -9,7 +9,7 @@ function MeetingCard({ meeting }: { meeting: Meeting }) {
   const timing = getMeetingTiming(meeting);
   return <a className={`meeting meeting-${timing}`} href={getMeetingAgendaHref(meeting)}>
     <div className="meeting-time"><strong>{meeting.time || 'Time TBD'}</strong></div>
-    <div className="meeting-info"><span className="meeting-kind">{getMeetingKind(meeting)}</span><strong>{meeting.committee || meeting.body || 'Meeting details unavailable'}</strong><span>{scheduledBill ? `${scheduledBill.id || 'Bill ID unavailable'} · ${scheduledBill.title || 'Title unavailable'}` : 'Agenda items unavailable'}</span></div>
+    <div className="meeting-info"><span className="meeting-kind">{getMeetingKind(meeting)}</span><strong>{meeting.committee || meeting.body || 'Meeting details unavailable'}</strong><span>{scheduledBill ? `${scheduledBill.id || 'Bill ID unavailable'} - ${scheduledBill.title || 'Title unavailable'}` : 'Agenda items unavailable'}</span></div>
     <div className="meeting-end"><span className={`meeting-state ${timing}`}>{meetingTimingLabels[timing]}</span><span className="room">{meeting.room || 'Location TBD'}</span></div>
   </a>;
 }
@@ -18,9 +18,9 @@ export function MeetingAgenda({ meetings }: { meetings?: readonly Meeting[] | nu
   const entries = Array.isArray(meetings) ? meetings.filter((meeting): meeting is Meeting => Boolean(meeting)) : [];
   const primaryMeeting = getPrimaryMeeting(entries);
   return <section className="agenda-card" aria-labelledby="agenda-title">
-    <div className="section-heading compact"><div><p className="eyebrow">AT THE CAPITOL</p><h2 id="agenda-title">What’s happening next</h2></div><span className="calendar-button" aria-hidden="true">▦</span></div>
+    <div className="section-heading compact"><div><p className="eyebrow">AT THE CAPITOL</p><h2 id="agenda-title">What's happening next</h2></div><span className="calendar-button" aria-hidden="true"><span></span><span></span><span></span><span></span></span></div>
     <div className="date-line"><strong>Prototype schedule</strong><span>{entries.length} scheduled items</span></div>
-    <p className="agenda-fixture-note">“Today” and “Next” refer to this demo fixture, not the live calendar. Verify all schedules with the official source.</p>
+    <p className="agenda-fixture-note">"Today" and "Next" refer to this demo fixture, not the live calendar. Verify all schedules with the official source.</p>
     {entries.length ? timingOrder.map((timing) => {
       const group = entries.filter((meeting) => getMeetingTiming(meeting) === timing);
       return group.length ? <section className={`meeting-group meeting-group-${timing}`} key={timing} aria-labelledby={`agenda-${timing}`}>

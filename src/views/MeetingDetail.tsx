@@ -19,11 +19,11 @@ function ScheduledBills({ bills }: { bills?: readonly ScheduledBill[] }) {
 
 export function MeetingDetail({ slug }: { slug: string }) {
   const { meeting } = useMeetingDetail(slug);
-  if (!meeting) return <><SiteHeader activePage="Meetings" /><main className="not-found"><a className="back-link" href="/#meetings">← Back to meetings</a><p className="eyebrow">MEETING NOT FOUND</p><h1>We couldn’t find that agenda.</h1><p>The meeting may not be available in the current fixture. Return to the dashboard to view listed meetings.</p></main></>;
+  if (!meeting) return <><SiteHeader activePage="Meetings" /><main className="not-found"><a className="back-link" href="/#meetings">Back to meetings</a><p className="eyebrow">MEETING NOT FOUND</p><h1>We couldn't find that agenda.</h1><p>The meeting may not be available in the current fixture. Return to the dashboard to view listed meetings.</p></main></>;
 
   return <><SiteHeader activePage="Meetings" /><main className="detail-page agenda-detail-page"><header className="detail-header">
-    <a className="back-link" href="/#meetings">← Back to meetings</a><p className="eyebrow">OFFICIAL MEETING INFORMATION</p>
-    <h1>{meeting.committee ?? 'Meeting details unavailable'}</h1><p className="detail-sponsor">{meeting.body ?? 'Legislative meeting'} · {meeting.date ?? 'Date unavailable'} · {meeting.time ?? 'Time unavailable'}</p>
+    <a className="back-link" href="/#meetings">Back to meetings</a><p className="eyebrow">OFFICIAL MEETING INFORMATION</p>
+    <h1>{meeting.committee ?? 'Meeting details unavailable'}</h1><p className="detail-sponsor">{meeting.body ?? 'Legislative meeting'} - {meeting.date ?? 'Date unavailable'} - {meeting.time ?? 'Time unavailable'}</p>
     <div className="detail-actions"><span className="fixture-badge">Fixture data</span><SourceLink href={meeting.agendaSourceUrl}>{meeting.sourceLabel ?? 'Open official agenda/source'}</SourceLink></div>
   </header><div className="agenda-layout"><section className="detail-card meeting-information"><p className="eyebrow">MEETING DETAILS</p><h2>When and where</h2>
     <dl><div><dt>Date</dt><dd>{meeting.date ?? 'Unavailable'}</dd></div><div><dt>Time</dt><dd>{meeting.time ?? 'Unavailable'}</dd></div><div><dt>Committee or body</dt><dd>{meeting.committee ?? meeting.body ?? 'Unavailable'}</dd></div><div><dt>Room / location</dt><dd>{meeting.room ?? 'Location unavailable'}</dd></div></dl>
