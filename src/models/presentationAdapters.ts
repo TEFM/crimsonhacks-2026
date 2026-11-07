@@ -86,7 +86,7 @@ export function toMeetingViewModel(meeting: BackendMeeting, index: number): Meet
     slug,
     date: 'Fixture schedule',
     time: `${meeting.time} ${meeting.meridiem}`,
-    committee: meeting.committee,
+    committee: meeting.active ? `House ${meeting.committee}` : meeting.committee,
     body: 'Legislative committee',
     room: meeting.room,
     timing: meeting.active ? 'today' : 'upcoming',
