@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createBillRepository, normalizeBill } from '../src/models/billRepository.js';
 import { handler } from '../api/bills.js';
+import { handler as deployedBillsHandler } from '../amplify/functions/bills-api/handler.js';
 import { createUtahLegislatureClient, mapOfficialBill, toOfficialBillKey } from '../src/models/utahLegislatureClient.js';
 
 const validBill = {
@@ -11,6 +12,8 @@ const validBill = {
   sponsor: 'Rep. Example',
   officialSourceUrl: 'https://le.utah.gov/example'
 };
+
+const liveDeveloperToken = process.env.UTAH_LEGISLATURE_DEVELOPER_TOKEN?.trim();
 
 test('normalizeBill rejects malformed records and unsafe source URLs', () => {
   assert.equal(normalizeBill({ id: 'not a bill', title: 'Bad', topic: 'Housing' }), null);
@@ -73,7 +76,9 @@ test('repository decodes direct-link bill IDs and does not expose invalid record
 test('bill API returns a record for a direct bill request and 404 for an unknown bill', async () => {
   const found = await handler({ pathParameters: { id: 'HB%20218' } });
   assert.equal(found.statusCode, 200);
-  assert.equal(JSON.parse(found.body).data.id, 'HB 218');
+  const foundBody = JSON.parse(found.body);
+  assert.equal(foundBody.data.id, 'HB 218');
+  assert.equal(foundBody.meta.source, 'cached-demo-fixture');
 
   const missing = await handler({ pathParameters: { id: 'SB%20999' } });
   assert.equal(missing.statusCode, 404);
@@ -93,6 +98,12 @@ test('bill API filters fixture records and supports raw-path bill URLs', async (
   const direct = await handler({ rawPath: '/api/bills/SB%20142' });
   assert.equal(direct.statusCode, 200);
   assert.equal(JSON.parse(direct.body).data.id, 'SB 142');
+});
+
+test('Amplify Lambda entry point exposes the validated bills handler', async () => {
+  const response = await deployedBillsHandler({ pathParameters: { id: 'HB%20218' } });
+  assert.equal(response.statusCode, 200);
+  assert.equal(JSON.parse(response.body).data.id, 'HB 218');
 });
 
 test('official bill adapter maps named fields and formats Utah bill endpoint keys', () => {
@@ -150,4 +161,26 @@ test('official client handles a single detail object and reports upstream failur
     fetchImpl: async () => ({ ok: false, status: 503, json: async () => ({}) })
   });
   await assert.rejects(failingClient.listBills(), /503/);
+});
+
+test('official client rejects an unexpected bill-list response shape', async () => {
+  const client = createUtahLegislatureClient({
+    token: 'token',
+    fetchImpl: async () => ({ ok: true, status: 200, json: async () => ({ unexpected: [] }) })
+  });
+
+  await assert.rejects(client.listBills(), /unexpected bill-list shape/);
+});
+
+test('live Utah bill feed returns normalized official records', { skip: !liveDeveloperToken }, async () => {
+  const client = createUtahLegislatureClient({ token: liveDeveloperToken });
+  const bills = await client.listBills();
+
+  assert.ok(bills.length > 0, 'The official bill list should contain at least one mappable bill.');
+  for (const bill of bills) {
+    assert.match(bill.id, /^(HB|SB) \d+$/, 'Bill IDs must be normalized for direct links.');
+    assert.ok(bill.title.trim(), 'Official bills must include a title.');
+    assert.equal(bill.sourceStatus, 'Official Utah Legislature API');
+    assert.equal(bill.summary, 'Official bill data retrieved from the Utah Legislature API. Read the official bill text for legal details.');
+  }
 });
