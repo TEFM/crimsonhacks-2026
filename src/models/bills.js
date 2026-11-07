@@ -35,6 +35,12 @@ export const bills = [
         note: 'No fiscal note is included with this prototype fixture.',
         sourceUrl: 'https://le.utah.gov/'
       },
+      impactSimulator: {
+        annualProgramCost: 1200000,
+        estimatedAffectedHouseholds: 50000,
+        assumptions: 'Demo-only inputs divide a hypothetical annual program cost evenly across an estimated number of affected households. They do not reflect a fiscal note, tax rate, eligibility rules, or how costs would actually be funded.',
+        fiscalNoteSourceUrl: 'https://le.utah.gov/'
+      },
       personaImpacts: {
         Renter: 'If additional qualifying homes are approved and built, renters may eventually have more nearby housing options. The timing, number, and affordability of homes are uncertain.',
         Homeowner: 'Homeowners near qualifying projects may see changes in nearby development activity. The fixture does not establish property-value effects.',

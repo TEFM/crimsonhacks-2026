@@ -1,6 +1,7 @@
 import { useBillDetail } from '../controllers/useBillDetail';
 import { SiteHeader } from '../components/SiteHeader';
 import { ArrowIcon } from '../components/ArrowIcon';
+import { ImpactSimulator } from '../components/ImpactSimulator';
 
 function SourceLink({ href, children = 'View official source' }) {
   return <a className="source-link" href={href} target="_blank" rel="noreferrer">{children} <ArrowIcon /></a>;
@@ -65,5 +66,5 @@ export function BillDetail({ slug }) {
   const { bill, persona, setPersona, personas, personaImpact } = useBillDetail(slug);
   if (!bill) return <main className="not-found"><a className="back-link" href="/">← Back to dashboard</a><p className="eyebrow">BILL NOT FOUND</p><h1>We couldn’t find that bill.</h1><p>Try returning to the dashboard and selecting one of the available demo bills.</p></main>;
 
-  return <><SiteHeader activePage="" /><main className="detail-page"><DetailHeader bill={bill} /><div className="detail-grid"><div className="detail-primary"><OfficialActivity bill={bill} /><Translator bill={bill} /><Votes bill={bill} /></div><aside className="detail-rail"><PersonalImpact bill={bill} personas={personas} persona={persona} setPersona={setPersona} personaImpact={personaImpact} /><ImpactSnapshot bill={bill} /><Historical bill={bill} /></aside></div></main></>;
+  return <><SiteHeader activePage="" /><main className="detail-page"><DetailHeader bill={bill} /><div className="detail-grid"><div className="detail-primary"><OfficialActivity bill={bill} /><Translator bill={bill} /><Votes bill={bill} /></div><aside className="detail-rail"><PersonalImpact bill={bill} personas={personas} persona={persona} setPersona={setPersona} personaImpact={personaImpact} /><ImpactSimulator bill={bill} /><ImpactSnapshot bill={bill} /><Historical bill={bill} /></aside></div></main></>;
 }
