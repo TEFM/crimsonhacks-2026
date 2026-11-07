@@ -1,6 +1,6 @@
-import { meetings } from '../models/bills';
-import type { BillSeed, Meeting } from '../models/bills';
-import { useDashboard } from '../controllers/useDashboard';
+import { meetings } from '../models/bills.js';
+import type { Bill, Meeting } from '../models/bills.js';
+import { useDashboard } from '../controllers/useDashboard.js';
 
 function Mark() {
   return <div className="mark" aria-hidden="true"><span></span><span></span><span></span></div>;
@@ -14,7 +14,7 @@ function ArrowIcon() {
   return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13" /><path d="m13 6 6 6-6 6" /></svg>;
 }
 
-function BillCard({ bill }: { bill: BillSeed }) {
+function BillCard({ bill }: { bill: Bill }) {
   return (
     <article className="bill-card">
       <div className="bill-topline">
@@ -43,7 +43,7 @@ function MeetingCard({ meeting }: { meeting: Meeting }) {
 }
 
 export function Dashboard() {
-  const { topic, setTopic, query, setQuery, filteredBills, topics } = useDashboard();
+  const { topic, setTopic, query, setQuery, filteredBills, topics, dataNotice, isLoading } = useDashboard();
 
   return (
     <main>
@@ -76,8 +76,9 @@ export function Dashboard() {
           <div className="filters" aria-label="Bill topics">
             {topics.map((item) => <button key={item} className={topic === item ? 'selected' : ''} onClick={() => setTopic(item)} type="button">{item}</button>)}
           </div>
+          {dataNotice ? <p role="status">{dataNotice}</p> : null}
           <div className="bill-list">
-            {filteredBills.length ? filteredBills.map((bill) => <BillCard key={bill.id} bill={bill} />) : <div className="empty"><strong>No bills found</strong><span>Try a different topic or search term.</span></div>}
+            {isLoading ? <div className="empty"><strong>Loading bills</strong><span>Checking the official legislative feed.</span></div> : filteredBills.length ? filteredBills.map((bill) => <BillCard key={bill.id} bill={bill} />) : <div className="empty"><strong>No bills found</strong><span>Try a different topic or search term.</span></div>}
           </div>
         </section>
 
