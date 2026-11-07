@@ -101,7 +101,22 @@ export const bills = [
 ];
 
 export const meetings = [
-  { time: '9:00', meridiem: 'AM', committee: 'Land Use Committee', item: 'HB 218 · Starter Home Availability', room: 'Room 445', active: true },
-  { time: '11:30', meridiem: 'AM', committee: 'Natural Resources Committee', item: 'SB 142 · Waterwise Communities', room: 'Room 210' },
-  { time: '2:00', meridiem: 'PM', committee: 'Education Committee', item: 'HB 301 · Innovation Grants', room: 'Room 30' }
+  {
+    id: 'house-land-use-feb-10-2026', slug: 'house-land-use-feb-10-2026', date: 'Monday, February 10, 2026', time: '9:00 AM',
+    committee: 'House Land Use Committee', body: 'House committee', room: 'Room 445', timing: 'today',
+    scheduledBills: [{ id: 'HB 218', title: 'Starter Home Availability Amendments', billSlug: 'hb-218' }],
+    agendaSourceUrl: 'https://le.utah.gov/', sourceLabel: 'Official Utah Legislature source (fixture link)'
+  },
+  {
+    id: 'natural-resources-feb-10-2026', slug: 'natural-resources-feb-10-2026', date: 'Monday, February 10, 2026', time: '11:30 AM',
+    committee: 'Natural Resources Committee', body: 'House committee', room: 'Room 210', timing: 'next',
+    scheduledBills: [{ id: 'SB 142', title: 'Waterwise Communities Act' }],
+    agendaSourceUrl: 'https://le.utah.gov/', sourceLabel: 'Official Utah Legislature source (fixture link)'
+  },
+  {
+    id: 'education-feb-10-2026', slug: 'education-feb-10-2026', date: 'Monday, February 10, 2026', time: '2:00 PM',
+    committee: 'Education Committee', body: 'House committee', room: 'Room 30', timing: 'upcoming',
+    scheduledBills: [{ id: 'HB 301', title: 'Classroom Innovation Grant Program' }],
+    agendaSourceUrl: 'https://le.utah.gov/', sourceLabel: 'Official Utah Legislature source (fixture link)'
+  }
 ];
