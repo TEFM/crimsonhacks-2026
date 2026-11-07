@@ -3,6 +3,7 @@ import { topics } from '../models/bills.js';
 import { billRepository } from '../models/billRepository.js';
 import { fetchBills } from '../models/billsApi.js';
 import { filterBills } from '../models/dashboard.js';
+import { toBillViewModels } from '../models/presentationAdapters.js';
 
 export function useDashboard() {
   const [topic, setTopic] = useState('All bills');
@@ -13,22 +14,19 @@ export function useDashboard() {
 
   useEffect(() => {
     let active = true;
-    fetchBills()
-      .then((result) => {
-        if (!active) return;
-        setLoadedBills(result.bills);
-        setDataNotice(result.source === 'official-utah-legislature-api' ? null : result.notice ?? 'Official API unavailable; showing cached demo fixtures.');
-      })
-      .catch(() => {
-        if (active) setDataNotice('Live bill data is unavailable; showing cached demo fixtures.');
-      })
-      .finally(() => {
-        if (active) setIsLoading(false);
-      });
+    fetchBills().then((result) => {
+      if (!active) return;
+      setLoadedBills(result.bills);
+      setDataNotice(result.source === 'official-utah-legislature-api' ? null : result.notice ?? 'Official API unavailable; showing cached demo fixtures.');
+    }).catch(() => {
+      if (active) setDataNotice('Live bill data is unavailable; showing cached demo fixtures.');
+    }).finally(() => {
+      if (active) setIsLoading(false);
+    });
     return () => { active = false; };
   }, []);
 
-  const filteredBills = useMemo(() => filterBills(loadedBills, topic, query), [loadedBills, topic, query]);
-
+  const viewBills = useMemo(() => toBillViewModels(loadedBills), [loadedBills]);
+  const filteredBills = useMemo(() => filterBills(viewBills, topic, query), [viewBills, topic, query]);
   return { topic, setTopic, query, setQuery, filteredBills, topics, dataNotice, isLoading };
 }
