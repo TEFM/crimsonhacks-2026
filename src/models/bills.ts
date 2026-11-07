@@ -1,6 +1,6 @@
-import type { BillSeed } from './types';
+import type { BillSeed } from './types.js';
 
-export type { BillSeed } from './types';
+export type { BillSeed } from './types.js';
 /** Validated API/fixture record used by the repository layer. Kept separate from the display model. */
 export interface Bill {
   id: string; title: string; topic: string; sponsor: string; status: string; statusTone: string;

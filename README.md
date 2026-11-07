@@ -43,6 +43,8 @@ This repository includes an Amplify Gen 2 HTTP API configuration. The Amplify bu
 
 When `VITE_BILLS_API_URL` is missing or the API fails, the dashboard safely uses visibly labeled demo fixtures. Do not add a `VITE_` prefix to the Utah developer token.
 
-`amplify.yml` builds the Vite app with `npm ci` and publishes `dist`. Keep any future API or AI credentials in Amplify environment variables, never in the client or a committed `.env` file.
+`amplify.yml` selects Node.js 24, installs locked dependencies with `npm ci`, deploys the backend, then builds the Vite app and publishes `dist`. Keep any future API or AI credentials in Amplify environment variables, never in the client or a committed `.env` file.
+
+The backend uses `amplify/tsconfig.json` with NodeNext module resolution. Shared modules imported by the API must use explicit `.js` extensions in relative imports and re-exports, including type-only imports. The frontend's bundler mode accepts extensionless imports, so `npm run build` alone does not catch this deployment failure. `npm test` includes a regression check that runs `tsc --project amplify/tsconfig.json --noEmit` without deploying AWS resources.
 
 Connect this repository and branch in Amplify Hosting and use the checked-in build settings. No environment variables are required for the fixture-only frontend. In Hosting → Rewrites and redirects, configure a **200 rewrite** to `/index.html` for SPA paths (including `/bills/<slug>` and `/meetings/<slug>`), preserving static asset requests. Refresh those direct URLs after deployment to verify the hosting rule; Vite's local SPA fallback alone does not verify the deployed Amplify configuration.
