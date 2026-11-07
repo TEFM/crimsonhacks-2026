@@ -28,9 +28,39 @@ const personas = {
 
 export const bills: readonly BillSeed[] = [
   {
-    id: 'HB 218', slug: 'hb-218', title: 'Starter Home Availability Amendments', topic: 'Housing', sponsor: 'Rep. A. Morales', status: 'In committee', statusTone: 'amber', summary: 'Creates a faster approval path for qualifying starter-home developments near transit and existing utilities.', hearing: 'Land Use Committee · Tue, 9:00 AM', updated: 'Updated 38 min ago', votes: '6–3 committee vote', initials: 'HM', officialSourceUrl, sourceStatus: fixtureSource,
-    explanation: 'This prototype record describes a possible faster approval path for qualifying starter-home developments. The actual legal effect depends on official text, amendments, and implementation rules.', fiscalNote: unavailableFiscalNote,
-    personas: { ...personas, Renter: 'More housing supply could eventually affect rental options, but this fixture cannot estimate rents or timing.', Homeowner: 'Nearby development and planning processes could change; property-value effects are uncertain.', Taxpayer: 'No verified fiscal note is available.' }, timeline: [{ label: 'Committee vote', detail: 'Prototype fixture reports 6–3; verify the official roll call.', date: 'Demo timeline' }], simulator: { annualProgramCost: 120000, affectedHouseholds: 4000, assumptions: 'Illustrative prototype inputs only; not a fiscal note or prediction.' }, historicalEffect: { title: 'Related prior bill', detail: 'No verified related-bill outcome is included in this fixture.', sourceUrl: null }
+    id: 'HB 218', slug: 'hb-218', title: 'Starter Home Availability Amendments', topic: 'Housing', sponsor: 'Rep. A. Morales', status: 'In committee', statusTone: 'amber', summary: 'Prototype proposal: a faster approval path for qualifying starter-home developments near transit and existing utilities.', hearing: 'Land Use Committee · Tue, 9:00 AM', updated: 'Cached prototype fixture', votes: 'Committee action listed in prototype fixture', initials: 'HM', officialSourceUrl, sourceStatus: fixtureSource,
+    explanation: {
+      plainSummary: 'This proposal explores a faster approval path for qualifying starter-home developments near transit and existing utilities. Eligibility and local planning requirements must be checked against official text. This prototype does not establish that more homes will be built or that prices will fall.',
+      currentVsProposed: 'Current-law approval procedures are not verified in this prototype. The proposed faster approval path and its eligibility conditions require official bill text for confirmation.',
+      affectedGroups: 'Potential homebuyers and renters, nearby homeowners, local planning staff, builders, and taxpayers.',
+      effectiveDate: 'Effective date unavailable in this fixture. Passage, amendments, and final official text would determine when any change could begin.',
+      uncertainties: 'Prototype explanation only, not legal or financial advice. Housing supply, prices, participation, infrastructure costs, and implementation timing are uncertain.'
+    },
+    fiscalNote: unavailableFiscalNote,
+    personas: {
+      Renter: 'Additional starter homes could expand housing options if eligible projects are approved and built. This prototype cannot estimate rents, affordability, or when homes might become available.',
+      Homeowner: 'Nearby development and local approval processes could change if the final text applies to your area. Property-value effects and neighborhood changes are uncertain.',
+      Parent: 'Families considering a starter home may have more options if projects proceed. School enrollment, school funding, and family housing savings are not established by this prototype.',
+      'Small-business owner': 'Builders and nearby businesses could encounter different planning processes or local demand if projects proceed. Eligibility, compliance costs, and business benefits remain unverified.',
+      'Driver / commuter': 'The fixture focuses on homes near transit and existing utilities, which could change some households\' travel options. It does not establish service availability, traffic effects, or commuting savings.',
+      Taxpayer: 'Local planning or infrastructure work could have costs, but no verified fiscal note is included. The hypothetical simulator amount is not an appropriation, tax increase, or forecast of your household cost.'
+    },
+    timeline: [{ label: 'Committee action', detail: 'Prototype fixture: committee activity is listed; no official vote totals are included. Verify the official roll call.', date: 'Demo timeline' }],
+    simulator: { annualProgramCost: 120000, affectedHouseholds: 4000, assumptions: 'Illustrative scenario inputs only: a hypothetical annual program cost of $120,000 divided among 4,000 hypothetical households. These are not an official fiscal estimate, an appropriation, a tax bill, or a prediction of housing prices or household effects.' },
+    historicalEffect: { title: 'Historical context unavailable', detail: 'No verified prior-bill comparison or observed housing outcome is included in this prototype. Similar policy goals alone do not establish comparable results.', sourceUrl: null },
+    detail: {
+      latestAction: 'Prototype fixture: committee activity is listed; no official vote totals or verified action date are included. Check the official legislative record.',
+      nextEvent: 'Prototype fixture: Land Use Committee listing, Tuesday at 9:00 AM. This is a demo schedule; confirm the actual date, time, and agenda with official sources.',
+      plainSummary: 'This proposal explores a faster approval path for qualifying starter-home developments near transit and existing utilities. Eligibility and local planning requirements must be checked against official text. This prototype does not establish that more homes will be built or that prices will fall.',
+      currentVsProposed: [
+        ['Current law', 'Existing local approval procedures, zoning conditions, and review deadlines are not verified in this prototype fixture.'],
+        ['Proposed change', 'The fixture describes a possible faster approval path for qualifying starter-home developments near transit and existing utilities. Official text is needed to confirm eligibility, local obligations, exceptions, and implementation timing.']
+      ],
+      affectedGroups: ['Potential starter-home buyers and renters', 'Nearby homeowners and residents', 'Local planning staff and builders', 'Taxpayers if public resources are required'],
+      votes: [{ stage: 'Committee action', result: 'Prototype fixture only; no official vote totals or verified result are included. Confirm the official roll call.', date: 'Demo timeline', status: 'Unverified' }],
+      fiscal: { stateCost: 'Not available', localCost: 'Not available', note: 'No verified fiscal note is included in this prototype. Do not infer public costs, savings, or household charges from the hypothetical simulator.', sourceUrl: officialSourceUrl },
+      historical: { title: 'Historical context unavailable', description: 'No verified prior-bill comparison or observed housing outcome is included in this prototype. Similar policy goals alone do not establish comparable results; any comparison would require official bill records, implementation details, and outcome evidence.', sourceUrl: officialSourceUrl }
+    }
   },
   {
     id: 'SB 142', slug: 'sb-142', title: 'Waterwise Communities Act', topic: 'Water', sponsor: 'Sen. M. Ellis', status: 'On floor calendar', statusTone: 'blue', summary: 'Expands rebates for water-efficient landscaping and requires annual water-use reporting for large new developments.', hearing: 'Senate floor · Today, 1:00 PM', updated: 'Updated 1 hr ago', votes: 'Committee action listed in prototype fixture', initials: 'ME', officialSourceUrl, sourceStatus: fixtureSource,

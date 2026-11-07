@@ -6,7 +6,29 @@ export function calculateAnnualHouseholdImpact(annualProgramCost: number | undef
     return null;
   }
 
-  return annualProgramCost / affectedHouseholds;
+  const estimate = annualProgramCost / affectedHouseholds;
+  return Number.isFinite(estimate) ? estimate : null;
+}
+
+/** Household counts are positive whole numbers; an empty input is never treated as zero. */
+export function parseHouseholdCount(input: string): number | null {
+  const trimmedInput = input.trim();
+  if (!/^\d+$/.test(trimmedInput)) return null;
+  const count = Number(trimmedInput);
+  return Number.isSafeInteger(count) && count > 0 ? count : null;
+}
+
+export function getSimulatorSource(...candidates: readonly unknown[]): string | null {
+  for (const candidate of candidates) {
+    if (typeof candidate !== 'string') continue;
+    try {
+      const url = new URL(candidate);
+      if (url.protocol === 'https:') return url.toString();
+    } catch {
+      // Continue to the next existing source; never invent a bill-specific URL.
+    }
+  }
+  return null;
 }
 
 export function formatCurrency(value: number): string {

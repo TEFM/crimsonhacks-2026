@@ -7,6 +7,14 @@ export const meetingTimingLabels: Record<MeetingTiming, string> = {
   upcoming: 'Upcoming'
 };
 
+export function getMeetingTiming(meeting: Partial<Meeting>): MeetingTiming {
+  return meeting.timing === 'today' || meeting.timing === 'next' ? meeting.timing : 'upcoming';
+}
+
+export function getMeetingKind(meeting: Partial<Meeting>): string {
+  return /floor/i.test(`${meeting.body ?? ''} ${meeting.committee ?? ''}`) ? 'Floor calendar' : 'Committee meeting';
+}
+
 export function findMeetingBySlug(slug: string): Meeting | null {
   return toMeetingViewModels().find((meeting) => meeting?.slug === slug) ?? null;
 }

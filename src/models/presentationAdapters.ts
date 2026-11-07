@@ -1,5 +1,5 @@
 import { bills, meetings, type BillSeed, type Meeting as BackendMeeting } from './bills';
-import type { Bill, Meeting } from './types';
+import type { Bill, ImpactSimulatorData, Meeting, Vote } from './types';
 
 const OFFICIAL_UTAH_LEGISLATURE_URL = 'https://le.utah.gov/';
 
@@ -18,56 +18,105 @@ function initialsFor(name: string | undefined): string {
     .toUpperCase() || '--';
 }
 
-/** Converts validated backend fixture records into the optional data used by the UI. */
-export function toBillViewModel(bill: BillSeed): Bill {
-  const explanation = typeof bill.explanation === 'string' ? bill.explanation : bill.explanation?.plainSummary;
+function record(value: unknown): Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+
+function text(value: unknown, fallback = ''): string {
+  return typeof value === 'string' && value.trim() ? value.trim() : fallback;
+}
+
+function sourceUrl(...values: unknown[]): string {
+  for (const value of values) {
+    if (typeof value !== 'string') continue;
+    try {
+      const url = new URL(value);
+      if (url.protocol === 'https:') return url.toString();
+    } catch { /* Use the next existing source. */ }
+  }
+  return OFFICIAL_UTAH_LEGISLATURE_URL;
+}
+
+function personaImpacts(value: unknown): Record<string, string> {
+  return Object.fromEntries(Object.entries(record(value)).flatMap(([name, impact]) => text(impact) ? [[name, text(impact)]] : []));
+}
+
+function timelineVotes(value: unknown, isDetail: boolean): Vote[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item: unknown) => {
+    const event = record(item);
+    const stage = text(isDetail ? event.stage : event.label);
+    const result = text(isDetail ? event.result : event.detail);
+    return stage && result ? [{ stage, result, date: text(event.date, 'Date unavailable'), status: text(isDetail ? event.status : undefined, 'Unverified') }] : [];
+  });
+}
+
+function simulatorData(value: unknown, fiscalSource: string): ImpactSimulatorData | undefined {
+  const simulator = record(value);
+  const cost = simulator.annualProgramCost;
+  const households = simulator.estimatedAffectedHouseholds ?? simulator.affectedHouseholds;
+  if (typeof cost !== 'number' || !Number.isFinite(cost) || cost < 0
+    || typeof households !== 'number' || !Number.isSafeInteger(households) || households <= 0) return undefined;
   return {
-    id: bill.id,
-    slug: bill.slug ?? slugifyBillId(bill.id),
-    title: bill.title,
-    topic: bill.topic,
-    sponsor: bill.sponsor ?? 'Sponsor not available',
-    status: bill.status ?? 'Status unavailable',
-    statusTone: bill.statusTone === 'amber' || bill.statusTone === 'green' || bill.statusTone === 'crimson' ? bill.statusTone : 'blue',
-    summary: bill.summary ?? 'A plain-language summary is not available.',
-    hearing: bill.hearing ?? 'No upcoming meeting listed',
-    updated: bill.updated ?? 'Update time unavailable',
-    votes: bill.votes ?? 'Vote information unavailable',
-    initials: bill.initials ?? initialsFor(bill.sponsor),
-    officialSource: bill.officialSourceUrl ?? bill.officialTextUrl ?? OFFICIAL_UTAH_LEGISLATURE_URL,
+    annualProgramCost: cost, estimatedAffectedHouseholds: households,
+    assumptions: text(simulator.assumptions, 'No estimate assumptions are available for this fixture.'),
+    fiscalNoteSourceUrl: sourceUrl(simulator.fiscalNoteSourceUrl, fiscalSource)
+  };
+}
+
+/** Validate optional fixture fields before supplying plain text and safe links to React. */
+export function toBillViewModel(bill: BillSeed): Bill {
+  const seed = record(bill);
+  const detail = record(seed.detail);
+  const explanation = record(seed.explanation);
+  const summary = text(typeof seed.explanation === 'string' ? seed.explanation : explanation.plainSummary);
+  const officialSource = sourceUrl(seed.officialSourceUrl, seed.officialTextUrl);
+  const fiscal = { ...record(seed.fiscalNote), ...record(detail.fiscal) };
+  const fiscalSource = sourceUrl(fiscal.sourceUrl, officialSource);
+  const impacts = personaImpacts(detail.personaImpacts ?? seed.personas);
+  const fixtureVotes = timelineVotes(seed.timeline, false);
+  const historical = record(detail.historical ?? seed.historicalEffect);
+  const comparison: (readonly [string, string])[] = Array.isArray(detail.currentVsProposed)
+    ? detail.currentVsProposed.flatMap((pair: unknown) => Array.isArray(pair) && text(pair[0]) && text(pair[1]) ? [[text(pair[0]), text(pair[1])] as const] : [])
+    : [['Current law', text(explanation.currentVsProposed, 'A current-law comparison is not available in this fixture.')], ['Proposed change', text(seed.summary, 'The proposed change is not available in this fixture.')]];
+  const id = text(seed.id, 'Bill ID unavailable');
+  const sponsor = text(seed.sponsor, 'Sponsor not available');
+  return {
+    id,
+    slug: /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(text(seed.slug)) ? text(seed.slug) : /^(HB|SB) \d+$/.test(id) ? slugifyBillId(id) : undefined,
+    title: text(seed.title, 'Bill title unavailable'),
+    topic: text(seed.topic, 'Topic unavailable'),
+    sponsor,
+    status: text(seed.status, 'Status unavailable'),
+    statusTone: seed.statusTone === 'amber' || seed.statusTone === 'green' || seed.statusTone === 'crimson' ? seed.statusTone : 'blue',
+    summary: text(seed.summary, 'A plain-language summary is not available.'),
+    hearing: text(seed.hearing, 'No upcoming meeting listed'),
+    updated: text(seed.updated, 'Update time unavailable'),
+    votes: text(seed.votes, 'Vote information unavailable'),
+    initials: text(seed.initials, initialsFor(sponsor)),
+    officialSource,
     detail: {
-      latestAction: bill.timeline?.[0]?.detail ?? 'Latest action is unavailable in this cached fixture.',
-      nextEvent: bill.hearing ?? 'No upcoming meeting is available.',
-      sourceLabel: bill.sourceStatus ?? 'Official Utah Legislature bill record',
-      plainSummary: explanation ? `This proposal: ${explanation}` : 'A plain-language explanation is not available for this bill yet.',
-      currentVsProposed: [[
-        'Current law',
-        bill.explanation && typeof bill.explanation === 'object' ? bill.explanation.currentVsProposed : 'A current-law comparison is not available in this fixture.'
-      ], [
-        'Proposed change',
-        bill.summary ?? 'The proposed change is not available in this fixture.'
-      ]],
-      affectedGroups: Object.keys(bill.personas ?? {}),
-      votes: (bill.timeline ?? []).map((event) => ({ stage: event.label, result: event.detail, date: event.date, status: 'Recorded' })),
+      latestAction: text(detail.latestAction, fixtureVotes[0]?.result ?? 'Latest action is unavailable in this cached fixture.'),
+      nextEvent: text(detail.nextEvent, text(seed.hearing, 'No upcoming meeting is available.')),
+      sourceLabel: text(detail.sourceLabel, text(seed.sourceStatus, 'Official Utah Legislature bill record')),
+      plainSummary: text(detail.plainSummary, summary ? `This proposal: ${summary}` : 'A plain-language explanation is not available for this bill yet.'),
+      effectiveDate: text(detail.effectiveDate, text(explanation.effectiveDate)) || undefined,
+      currentVsProposed: comparison,
+      affectedGroups: Array.isArray(detail.affectedGroups) ? detail.affectedGroups.flatMap((group: unknown) => text(group) ? [text(group)] : []) : Object.keys(impacts),
+      votes: detail.votes !== undefined ? timelineVotes(detail.votes, true) : fixtureVotes,
       fiscal: {
-        stateCost: bill.fiscalNote?.stateCost ?? 'Not available',
-        localCost: bill.fiscalNote?.localCost ?? 'Not available',
-        note: 'Fiscal information is drawn from the cached demo fixture; verify the official fiscal note.',
-        sourceUrl: bill.fiscalNote?.sourceUrl ?? bill.officialSourceUrl ?? OFFICIAL_UTAH_LEGISLATURE_URL
+        stateCost: text(fiscal.stateCost, 'Not available'),
+        localCost: text(fiscal.localCost, 'Not available'),
+        note: text(fiscal.note, 'Fiscal information is drawn from the cached demo fixture; verify the official fiscal note.'),
+        sourceUrl: fiscalSource
       },
-      impactSimulator: bill.simulator ? {
-        annualProgramCost: bill.simulator.annualProgramCost,
-        estimatedAffectedHouseholds: bill.simulator.affectedHouseholds,
-        assumptions: bill.simulator.assumptions,
-        fiscalNoteSourceUrl: bill.fiscalNote?.sourceUrl ?? bill.officialSourceUrl ?? OFFICIAL_UTAH_LEGISLATURE_URL
-      } : undefined,
-      personaImpacts: bill.personas ?? {},
-      historical: bill.historicalEffect ? {
-        title: bill.historicalEffect.title,
-        description: bill.historicalEffect.detail,
-        sourceUrl: bill.historicalEffect.sourceUrl ?? bill.officialSourceUrl ?? OFFICIAL_UTAH_LEGISLATURE_URL
-      } : undefined,
-      ...bill.detail
+      impactSimulator: simulatorData(detail.impactSimulator ?? seed.simulator, fiscalSource),
+      personaImpacts: impacts,
+      historical: Object.keys(historical).length ? {
+        title: text(historical.title, 'Historical context unavailable'),
+        description: text(historical.description, text(historical.detail, 'No verified historical comparison is available.')),
+        sourceUrl: sourceUrl(historical.sourceUrl, officialSource)
+      } : undefined
     }
   };
 }
@@ -78,25 +127,43 @@ export function toBillViewModels(records: readonly BillSeed[] = bills): Bill[] {
 
 /** Adds stable UI identifiers to backend meeting fixtures without changing their API shape. */
 export function toMeetingViewModel(meeting: BackendMeeting, index: number): Meeting {
+  const seed = record(meeting);
+  const committee = text(seed.committee, 'Meeting details unavailable');
+  const time = text(seed.time);
+  const active = seed.active === true;
   const slug = index === 0
     ? 'house-land-use-feb-10-2026'
-    : `${meeting.committee.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}-${index + 1}`;
-  const [itemId, ...itemTitle] = meeting.item.split(' · ');
+    : `${committee.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}-${index + 1}`;
+  const item = text(seed.item);
+  const [itemId, ...itemTitle] = item.split(' · ');
   return {
     id: slug,
     slug,
     date: 'Fixture schedule',
-    time: `${meeting.time} ${meeting.meridiem}`,
-    committee: meeting.active ? `House ${meeting.committee}` : meeting.committee,
+    time: time ? `${time} ${text(seed.meridiem)}`.trim() : undefined,
+    committee: active ? `House ${committee}` : committee,
     body: 'Legislative committee',
-    room: meeting.room,
-    timing: meeting.active ? 'today' : 'upcoming',
-    scheduledBills: [{ id: itemId, title: itemTitle.join(' · ') || meeting.item, billSlug: slugifyBillId(itemId) }],
+    room: text(seed.room) || undefined,
+    timing: active ? 'today' : 'upcoming',
+    scheduledBills: itemId ? [{ id: itemId, title: itemTitle.join(' · ') || item, billSlug: /^(HB|SB) \d+$/.test(itemId) ? slugifyBillId(itemId) : undefined }] : [],
     agendaSourceUrl: OFFICIAL_UTAH_LEGISLATURE_URL,
     sourceLabel: 'Official Utah Legislature source (fixture link)'
   };
 }
 
 export function toMeetingViewModels(records: readonly BackendMeeting[] = meetings): Meeting[] {
-  return records.map(toMeetingViewModel);
+  const viewMeetings = records.map(toMeetingViewModel);
+  const nextIndex = viewMeetings.findIndex((meeting) => meeting.timing !== 'today');
+  if (nextIndex >= 0) viewMeetings[nextIndex] = { ...viewMeetings[nextIndex], timing: 'next' };
+  // This is the Senate-floor scenario already described by the SB 142 fixture,
+  // not a newly retrieved or verified legislative calendar entry.
+  if (records === meetings) viewMeetings.push({
+    id: 'senate-floor-sb-142-fixture', slug: 'senate-floor-sb-142-fixture',
+    date: 'Fixture schedule', time: '1:00 PM', committee: 'Senate floor', body: 'Floor calendar',
+    timing: 'today', room: 'Location not verified',
+    scheduledBills: [{ id: 'SB 142', title: 'Waterwise Communities Act', billSlug: 'sb-142' }],
+    agendaSourceUrl: OFFICIAL_UTAH_LEGISLATURE_URL,
+    sourceLabel: 'Official Utah Legislature source (prototype floor-calendar fixture)'
+  });
+  return viewMeetings;
 }

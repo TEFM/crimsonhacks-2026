@@ -10,6 +10,7 @@ export interface BillDetailData {
   nextEvent: string;
   sourceLabel: string;
   plainSummary: string;
+  effectiveDate?: string;
   currentVsProposed: readonly (readonly [string, string])[];
   affectedGroups: readonly string[];
   votes: readonly Vote[];
