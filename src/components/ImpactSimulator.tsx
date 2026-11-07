@@ -1,7 +1,8 @@
 import { calculateAnnualHouseholdImpact, formatCurrency } from '../models/impactSimulator';
 import { ArrowIcon } from './ArrowIcon';
+import type { Bill } from '../models/types';
 
-export function ImpactSimulator({ bill }) {
+export function ImpactSimulator({ bill }: { bill: Bill }) {
   const simulator = bill.detail?.impactSimulator;
   const annualImpact = calculateAnnualHouseholdImpact(
     simulator?.annualProgramCost,
@@ -12,7 +13,7 @@ export function ImpactSimulator({ bill }) {
   return <section className="detail-card simulator-card" aria-labelledby="simulator-title">
     <p className="eyebrow">ILLUSTRATIVE ESTIMATE</p>
     <h2 id="simulator-title">Household impact simulator</h2>
-    {annualImpact === null ? <p className="simulator-empty">An estimate is unavailable because this fixture does not include usable cost and household inputs.</p> : <>
+    {annualImpact === null || !simulator ? <p className="simulator-empty">An estimate is unavailable because this fixture does not include usable cost and household inputs.</p> : <>
       <div className="simulator-result">
         <span>Estimated annual household impact</span>
         <strong>{formatCurrency(annualImpact)}<small> per household / year</small></strong>

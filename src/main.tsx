@@ -12,4 +12,7 @@ function App() {
   return meetingMatch ? <MeetingDetail slug={meetingMatch[1]} /> : <Dashboard />;
 }
 
-createRoot(document.getElementById('root')).render(<App />);
+const rootElement = document.getElementById('root');
+
+if (!rootElement) throw new Error('Unable to find the application root.');
+createRoot(rootElement).render(<App />);

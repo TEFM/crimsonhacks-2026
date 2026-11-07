@@ -2,12 +2,14 @@ import { useBillDetail } from '../controllers/useBillDetail';
 import { SiteHeader } from '../components/SiteHeader';
 import { ArrowIcon } from '../components/ArrowIcon';
 import { ImpactSimulator } from '../components/ImpactSimulator';
+import type { Dispatch, ReactNode, SetStateAction } from 'react';
+import type { Bill } from '../models/types';
 
-function SourceLink({ href, children = 'View official source' }) {
+function SourceLink({ href, children = 'View official source' }: { href: string; children?: ReactNode }) {
   return <a className="source-link" href={href} target="_blank" rel="noreferrer">{children} <ArrowIcon /></a>;
 }
 
-function DetailHeader({ bill }) {
+function DetailHeader({ bill }: { bill: Bill }) {
   return <header className="detail-header">
     <a className="back-link" href="/">← Back to dashboard</a>
     <div className="detail-topline"><span className="bill-id">{bill.id}</span><span className={`status ${bill.statusTone}`}>{bill.status}</span></div>
@@ -18,7 +20,7 @@ function DetailHeader({ bill }) {
   </header>;
 }
 
-function OfficialActivity({ bill }) {
+function OfficialActivity({ bill }: { bill: Bill }) {
   const detail = bill.detail;
   return <section className="detail-card activity-card" aria-labelledby="activity-title">
     <p className="eyebrow">OFFICIAL ACTIVITY</p><h2 id="activity-title">Where it stands</h2>
@@ -28,7 +30,7 @@ function OfficialActivity({ bill }) {
   </section>;
 }
 
-function Translator({ bill }) {
+function Translator({ bill }: { bill: Bill }) {
   const detail = bill.detail;
   return <section className="detail-card translator-card" aria-labelledby="translation-title">
     <div className="card-title-row"><div><p className="eyebrow">AI-ASSISTED EXPLANATION</p><h2 id="translation-title">In plain language</h2></div><span className="demo-badge">Demo fixture</span></div>
@@ -39,7 +41,7 @@ function Translator({ bill }) {
   </section>;
 }
 
-function PersonalImpact({ bill, personas, persona, setPersona, personaImpact }) {
+function PersonalImpact({ bill, personas, persona, setPersona, personaImpact }: { bill: Bill; personas: readonly string[]; persona: string; setPersona: Dispatch<SetStateAction<string>>; personaImpact: string }) {
   return <section className="detail-card personal-card" aria-labelledby="personal-title">
     <p className="eyebrow">MAKE IT PERSONAL</p><h2 id="personal-title">What could this mean for you?</h2>
     <div className="persona-picker" aria-label="Choose a persona">{personas.map((item) => <button className={persona === item ? 'selected' : ''} key={item} type="button" onClick={() => setPersona(item)}>{item}</button>)}</div>
@@ -48,21 +50,21 @@ function PersonalImpact({ bill, personas, persona, setPersona, personaImpact }) 
   </section>;
 }
 
-function Votes({ bill }) {
+function Votes({ bill }: { bill: Bill }) {
   return <section className="detail-card votes-card" aria-labelledby="votes-title"><p className="eyebrow">OFFICIAL VOTES</p><h2 id="votes-title">Action timeline</h2><div className="timeline">{bill.detail?.votes?.map((vote) => <div className="timeline-item" key={vote.stage}><span className={`timeline-dot ${vote.status.toLowerCase()}`}></span><div><div className="vote-stage"><strong>{vote.stage}</strong><span>{vote.status}</span></div><p>{vote.date} · {vote.result}</p></div></div>) ?? <p>No vote data is available in this fixture.</p>}</div><SourceLink href={bill.officialSource}>Verify votes on the official record</SourceLink></section>;
 }
 
-function ImpactSnapshot({ bill }) {
+function ImpactSnapshot({ bill }: { bill: Bill }) {
   const fiscal = bill.detail?.fiscal;
   return <section className="detail-card fiscal-card" aria-labelledby="fiscal-title"><p className="eyebrow">OFFICIAL FISCAL NOTE</p><h2 id="fiscal-title">Impact snapshot</h2><div className="fiscal-values"><div><span>State cost</span><strong>{fiscal?.stateCost ?? 'Unavailable'}</strong></div><div><span>Local cost</span><strong>{fiscal?.localCost ?? 'Unavailable'}</strong></div></div><p>{fiscal?.note ?? 'No fiscal information is available.'}</p><SourceLink href={fiscal?.sourceUrl ?? bill.officialSource}>View fiscal-note source</SourceLink></section>;
 }
 
-function Historical({ bill }) {
+function Historical({ bill }: { bill: Bill }) {
   const historical = bill.detail?.historical;
   return <section className="detail-card historical-card"><p className="eyebrow">HISTORICAL CONTEXT</p><h2>{historical?.title ?? 'Related prior-bill comparison'}</h2><p>{historical?.description ?? 'No verified historical comparison is available.'}</p><SourceLink href={historical?.sourceUrl ?? bill.officialSource}>Review official sources</SourceLink></section>;
 }
 
-export function BillDetail({ slug }) {
+export function BillDetail({ slug }: { slug: string }) {
   const { bill, persona, setPersona, personas, personaImpact } = useBillDetail(slug);
   if (!bill) return <main className="not-found"><a className="back-link" href="/">← Back to dashboard</a><p className="eyebrow">BILL NOT FOUND</p><h1>We couldn’t find that bill.</h1><p>Try returning to the dashboard and selecting one of the available demo bills.</p></main>;
 

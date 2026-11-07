@@ -14,7 +14,9 @@ test('bill detail provides a safe fallback for an unavailable persona explanatio
 });
 
 test('impact simulator divides fixture costs across affected households', () => {
-  assert.equal(calculateAnnualHouseholdImpact(1200000, 50000), 24);
-  assert.equal(formatCurrency(calculateAnnualHouseholdImpact(1200000, 50000)), '$24');
+  const annualImpact = calculateAnnualHouseholdImpact(1200000, 50000);
+  assert.equal(annualImpact, 24);
+  if (annualImpact === null) throw new Error('Expected valid simulator inputs to produce an estimate.');
+  assert.equal(formatCurrency(annualImpact), '$24');
   assert.equal(calculateAnnualHouseholdImpact(1200000, 0), null);
 });

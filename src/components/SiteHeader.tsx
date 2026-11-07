@@ -4,7 +4,7 @@ function Mark() {
   return <div className="mark" aria-hidden="true"><span></span><span></span><span></span></div>;
 }
 
-export function SiteHeader({ activePage = 'Dashboard' }) {
+export function SiteHeader({ activePage = 'Dashboard' }: { activePage?: string }) {
   const navItems = [
     { label: 'Dashboard', href: '/' },
     { label: 'Meetings', href: '/#meetings' },

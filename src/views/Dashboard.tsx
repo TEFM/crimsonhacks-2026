@@ -3,12 +3,13 @@ import { getMeetingAgendaHref, getPrimaryMeeting, meetingTimingLabels } from '..
 import { useDashboard } from '../controllers/useDashboard';
 import { SiteHeader } from '../components/SiteHeader';
 import { ArrowIcon } from '../components/ArrowIcon';
+import type { Bill, Meeting } from '../models/types';
 
 function SearchIcon() { return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4.2 4.2" /></svg>; }
-function BillCard({ bill }) { return <article className="bill-card"><div className="bill-topline"><span className="bill-id">{bill.id}</span><span className={`status ${bill.statusTone}`}>{bill.status}</span></div><h3>{bill.title}</h3><p>{bill.summary}</p><div className="bill-footer"><div className="sponsor"><span className="avatar">{bill.initials}</span><span>{bill.sponsor}</span></div><a className="card-link" href={`/bills/${bill.slug}`}>View brief <ArrowIcon /></a></div><div className="bill-meta"><span>{bill.hearing}</span><span>{bill.votes}</span></div></article>; }
-function MeetingCard({ meeting }) {
+function BillCard({ bill }: { bill: Bill }) { return <article className="bill-card"><div className="bill-topline"><span className="bill-id">{bill.id}</span><span className={`status ${bill.statusTone}`}>{bill.status}</span></div><h3>{bill.title}</h3><p>{bill.summary}</p><div className="bill-footer"><div className="sponsor"><span className="avatar">{bill.initials}</span><span>{bill.sponsor}</span></div><a className="card-link" href={`/bills/${bill.slug}`}>View brief <ArrowIcon /></a></div><div className="bill-meta"><span>{bill.hearing}</span><span>{bill.votes}</span></div></article>; }
+function MeetingCard({ meeting }: { meeting: Meeting }) {
   const scheduledBill = meeting?.scheduledBills?.[0];
-  const label = meetingTimingLabels[meeting?.timing] ?? 'Upcoming';
+  const label = meeting.timing ? meetingTimingLabels[meeting.timing] : 'Upcoming';
   return <a className={`meeting meeting-${meeting?.timing ?? 'upcoming'}`} href={getMeetingAgendaHref(meeting)}>
     <div className="meeting-time"><strong>{meeting?.time ?? 'Time TBD'}</strong></div>
     <div className="meeting-info"><strong>{meeting?.committee ?? 'Meeting details unavailable'}</strong><span>{scheduledBill ? `${scheduledBill.id} · ${scheduledBill.title}` : 'Agenda items unavailable'}</span></div>

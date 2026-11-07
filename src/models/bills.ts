@@ -1,6 +1,8 @@
-export const topics = ['All bills', 'Housing', 'Water', 'Education', 'Transportation'];
+import type { Bill, Meeting } from './types';
 
-export const bills = [
+export const topics = ['All bills', 'Housing', 'Water', 'Education', 'Transportation'] as const;
+
+export const bills: readonly Bill[] = [
   {
     id: 'HB 218',
     slug: 'hb-218',
@@ -100,7 +102,7 @@ export const bills = [
   }
 ];
 
-export const meetings = [
+export const meetings: readonly Meeting[] = [
   {
     id: 'house-land-use-feb-10-2026', slug: 'house-land-use-feb-10-2026', date: 'Monday, February 10, 2026', time: '9:00 AM',
     committee: 'House Land Use Committee', body: 'House committee', room: 'Room 445', timing: 'today',

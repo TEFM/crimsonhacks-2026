@@ -1,13 +1,15 @@
 import { useMeetingDetail } from '../controllers/useMeetingDetail';
 import { SiteHeader } from '../components/SiteHeader';
 import { ArrowIcon } from '../components/ArrowIcon';
+import type { ReactNode } from 'react';
+import type { ScheduledBill } from '../models/types';
 
-function SourceLink({ href, children }) {
+function SourceLink({ href, children }: { href?: string; children: ReactNode }) {
   if (!href) return <p className="source-unavailable">An official agenda source is not available in this fixture.</p>;
   return <a className="source-link" href={href} target="_blank" rel="noreferrer">{children} <ArrowIcon /></a>;
 }
 
-function ScheduledBills({ bills }) {
+function ScheduledBills({ bills }: { bills?: readonly ScheduledBill[] }) {
   if (!Array.isArray(bills) || bills.length === 0) return <p className="agenda-empty">No scheduled bills are listed in this fixture.</p>;
   return <ul className="scheduled-bills">{bills.map((bill, index) => <li key={`${bill?.id ?? 'item'}-${index}`}>
     <span className="bill-id">{bill?.id ?? 'Bill ID unavailable'}</span>
@@ -15,7 +17,7 @@ function ScheduledBills({ bills }) {
   </li>)}</ul>;
 }
 
-export function MeetingDetail({ slug }) {
+export function MeetingDetail({ slug }: { slug: string }) {
   const { meeting } = useMeetingDetail(slug);
   if (!meeting) return <><SiteHeader activePage="Meetings" /><main className="not-found"><a className="back-link" href="/#meetings">← Back to meetings</a><p className="eyebrow">MEETING NOT FOUND</p><h1>We couldn’t find that agenda.</h1><p>The meeting may not be available in the current fixture. Return to the dashboard to view listed meetings.</p></main></>;
 

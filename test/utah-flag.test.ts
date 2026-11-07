@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { access, readFile } from 'node:fs/promises';
 
 test('shared site header includes a locally bundled Utah state flag with accessible text', async () => {
-  const header = await readFile(new URL('../src/components/SiteHeader.jsx', import.meta.url), 'utf8');
+  const header = await readFile(new URL('../src/components/SiteHeader.tsx', import.meta.url), 'utf8');
 
   await access(new URL('../src/assets/utah-state-flag.svg', import.meta.url));
   assert.match(header, /import utahStateFlag from '..\/assets\/utah-state-flag\.svg';/);
@@ -12,8 +12,8 @@ test('shared site header includes a locally bundled Utah state flag with accessi
 
 test('dashboard and bill detail render the shared site header', async () => {
   const [dashboard, detail] = await Promise.all([
-    readFile(new URL('../src/views/Dashboard.jsx', import.meta.url), 'utf8'),
-    readFile(new URL('../src/views/BillDetail.jsx', import.meta.url), 'utf8')
+    readFile(new URL('../src/views/Dashboard.tsx', import.meta.url), 'utf8'),
+    readFile(new URL('../src/views/BillDetail.tsx', import.meta.url), 'utf8')
   ]);
 
   assert.match(dashboard, /import \{ SiteHeader \} from '..\/components\/SiteHeader';/);
@@ -24,9 +24,9 @@ test('dashboard and bill detail render the shared site header', async () => {
 
 test('dashboard and bill detail reuse the shared arrow icon', async () => {
   const [dashboard, detail, arrowIcon] = await Promise.all([
-    readFile(new URL('../src/views/Dashboard.jsx', import.meta.url), 'utf8'),
-    readFile(new URL('../src/views/BillDetail.jsx', import.meta.url), 'utf8'),
-    readFile(new URL('../src/components/ArrowIcon.jsx', import.meta.url), 'utf8')
+    readFile(new URL('../src/views/Dashboard.tsx', import.meta.url), 'utf8'),
+    readFile(new URL('../src/views/BillDetail.tsx', import.meta.url), 'utf8'),
+    readFile(new URL('../src/components/ArrowIcon.tsx', import.meta.url), 'utf8')
   ]);
 
   assert.match(dashboard, /import \{ ArrowIcon \} from '..\/components\/ArrowIcon';/);
