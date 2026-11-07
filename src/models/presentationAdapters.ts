@@ -166,8 +166,6 @@ export function toMeetingViewModel(meeting: BackendMeeting, index: number): Meet
 
 export function toMeetingViewModels(records: readonly BackendMeeting[] = meetings): Meeting[] {
   const viewMeetings = records.map(toMeetingViewModel);
-  const nextIndex = viewMeetings.findIndex((meeting) => meeting.timing !== 'today');
-  if (nextIndex >= 0) viewMeetings[nextIndex] = { ...viewMeetings[nextIndex], timing: 'next' };
   // This is the Senate-floor scenario already described by the SB 142 fixture,
   // not a newly retrieved or verified legislative calendar entry.
   if (records === meetings) viewMeetings.push({
@@ -178,5 +176,17 @@ export function toMeetingViewModels(records: readonly BackendMeeting[] = meeting
     agendaSourceUrl: OFFICIAL_UTAH_LEGISLATURE_URL,
     sourceLabel: 'Official Utah Legislature source (prototype floor-calendar fixture)'
   });
-  return viewMeetings;
+  // Every bundled entry represents the same fictional agenda day. Keep them
+  // together and sort by the displayed time so a 1:00 PM item cannot appear
+  // before an 11:30 AM item merely because it was appended later.
+  return viewMeetings
+    .map((meeting) => ({ ...meeting, timing: 'today' as const }))
+    .sort((left, right) => fixtureTime(left.time) - fixtureTime(right.time));
+}
+
+function fixtureTime(value: string | undefined): number {
+  const match = value?.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!match) return Number.POSITIVE_INFINITY;
+  const hour = Number(match[1]) % 12 + (match[3].toUpperCase() === 'PM' ? 12 : 0);
+  return hour * 60 + Number(match[2]);
 }
