@@ -89,11 +89,33 @@ Landing dashboard
 
 ## Technical approach
 
-- **Frontend:** Use the fastest familiar stack (React, Next.js, or Vite).
+- **Frontend:** Use **React + Vite** for the single-page interface.
+- **Runtime/tooling:** Use **Node.js + npm** for local development, builds, and backend functions.
+- **Styling:** Use Tailwind CSS only if the team already knows it; otherwise use a simple component/CSS approach to protect build time.
 - **Data:** Start with local JSON fixtures; optionally connect to Utah Legislature JSON feeds.
 - **AI translation:** Ask for structured fields: `plain_summary`, `current_vs_proposed`, `affected_groups`, `personalized_impact`, `uncertainties`, and `source_citations`.
 - **Trust:** Keep an official source link beside every generated explanation.
 - **Disclosure:** Label outputs: “AI-assisted explanation, not legal or financial advice. Verify against official bill text.”
+
+### React and Node.js implementation choice
+
+React + Vite is the preferred frontend because it is quick to build, easy to demo as a dashboard, and deploys cleanly as a static single-page app. Node.js powers the Vite build process and should also be used for any protected server-side work.
+
+Start with a frontend-only app using seeded bill fixtures. Add a Node.js serverless function/API only for AI translation, private API tokens, or live-data transformation. Do not build a separate always-running Express server during the hackathon unless the team already has it working.
+
+### AWS Amplify deployment requirement
+
+The app must be deployable as a public website through **AWS Amplify Hosting**. Keep the initial architecture simple and deployment-safe:
+
+- Use a Git-connected Amplify app for continuous deployment from the project repository.
+- Include a production build command and output directory in the repository (`npm run build`; for React + Vite, publish `dist`).
+- Keep Utah bill fixtures in the frontend repository so the demo works without a backend or live-data dependency.
+- Put any AI calls, private API tokens, or future live-data transformations behind a Node.js Amplify serverless function/API route; never expose secrets in browser code.
+- Store secrets only as Amplify environment variables, never in committed `.env` files.
+- Configure a catch-all rewrite to `index.html` if using a single-page Vite/React app, so direct links to individual bill pages work after deployment.
+- Add a `README.md` section with the repository connection, environment variables, build settings, and Amplify deployment steps.
+
+**Deployment acceptance check:** a fresh clone can build successfully, Amplify can publish it without local-only dependencies, and a shared URL loads the dashboard plus a direct bill-detail URL.
 
 ### Simulator framing
 
