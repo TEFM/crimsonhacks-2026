@@ -3,6 +3,7 @@ import { SiteHeader } from '../components/SiteHeader';
 import { ArrowIcon } from '../components/ArrowIcon';
 import { ImpactSimulator } from '../components/ImpactSimulator';
 import { EffectiveDate } from '../components/EffectiveDate';
+import { BillSummarizer } from '../components/BillSummarizer';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import type { Bill } from '../models/types';
 
@@ -79,5 +80,5 @@ export function BillDetail({ slug }: { slug: string }) {
   const { bill, persona, setPersona, personas, personaImpact, dataNotice } = useBillDetail(slug);
   if (!bill) return <main className="not-found"><a className="back-link" href="/">Back to dashboard</a><p className="eyebrow">BILL NOT FOUND</p><h1>We couldn't find that bill.</h1><p>Try returning to the dashboard and selecting one of the available demo bills.</p></main>;
 
-  return <><SiteHeader activePage="" /><main className="detail-page"><p className="disclaimer" role="status">{dataNotice}</p><DetailHeader bill={bill} /><div className="detail-grid"><div className="detail-primary"><OfficialActivity bill={bill} /><Translator bill={bill} /><Votes bill={bill} /><ImpactSnapshot bill={bill} /><Historical bill={bill} /></div><aside className="detail-rail"><PersonalImpact bill={bill} personas={personas} persona={persona} setPersona={setPersona} personaImpact={personaImpact} /><ImpactSimulator bill={bill} /></aside></div></main></>;
+  return <><SiteHeader activePage="" /><main className="detail-page"><p className="disclaimer" role="status">{dataNotice}</p><DetailHeader bill={bill} /><div className="detail-grid"><div className="detail-primary"><OfficialActivity bill={bill} /><BillSummarizer bill={bill} /><Translator bill={bill} /><Votes bill={bill} /><ImpactSnapshot bill={bill} /><Historical bill={bill} /></div><aside className="detail-rail"><PersonalImpact bill={bill} personas={personas} persona={persona} setPersona={setPersona} personaImpact={personaImpact} /><ImpactSimulator bill={bill} /></aside></div></main></>;
 }

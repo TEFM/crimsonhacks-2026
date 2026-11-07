@@ -29,6 +29,8 @@ test('agenda renders semantic timing sections, meeting kinds, and existing agend
   assert.match(html, /not the live calendar/);
   assert.match(html, /href="\/meetings\/house-land-use-feb-10-2026"/);
   assert.match(html, /href="\/meetings\/senate-floor-sb-142-fixture"/);
+  assert.match(html, /class="calendar-button" href="\/meetings\/house-land-use-feb-10-2026"/);
+  assert.match(html, /aria-label="Open the House Land Use Committee agenda"/);
 });
 
 test('agenda empty and partial states retain useful safe fallbacks', () => {

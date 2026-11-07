@@ -18,7 +18,7 @@ export function MeetingAgenda({ meetings }: { meetings?: readonly Meeting[] | nu
   const entries = Array.isArray(meetings) ? meetings.filter((meeting): meeting is Meeting => Boolean(meeting)) : [];
   const primaryMeeting = getPrimaryMeeting(entries);
   return <section className="agenda-card" aria-labelledby="agenda-title">
-    <div className="section-heading compact"><div><p className="eyebrow">AT THE CAPITOL</p><h2 id="agenda-title">What's happening next</h2></div><span className="calendar-button" aria-hidden="true"><span></span><span></span><span></span><span></span></span></div>
+    <div className="section-heading compact"><div><p className="eyebrow">AT THE CAPITOL</p><h2 id="agenda-title">What's happening next</h2></div>{primaryMeeting ? <a className="calendar-button" href={getMeetingAgendaHref(primaryMeeting)} aria-label={`Open the ${primaryMeeting.committee ?? primaryMeeting.body ?? 'next'} agenda`}><span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span></a> : <span className="calendar-button" aria-hidden="true"><span></span><span></span><span></span><span></span></span>}</div>
     <div className="date-line"><strong>Prototype schedule</strong><span>{entries.length} scheduled items</span></div>
     <p className="agenda-fixture-note">"Today" and "Next" refer to this demo fixture, not the live calendar. Verify all schedules with the official source.</p>
     {entries.length ? timingOrder.map((timing) => {
