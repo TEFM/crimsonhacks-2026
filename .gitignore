@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+
+# Production and tool build output
+dist/
+build/
+.vite/
+.cache/
+
+# Test output
+coverage/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local environment variables and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+service-account*.json
+
+# AWS Amplify generated/local state
+.amplify/
+amplify/.config/local-*
+amplify/#current-cloud-backend/
+amplify/backend/amplify-meta.json
+amplify/backend/.temp/
+amplify_outputs.json
+
+# Editor and operating-system files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.swp
+*~
