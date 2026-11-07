@@ -65,19 +65,9 @@ function Votes({ bill }: { bill: Bill }) {
   return <section className="detail-card votes-card" aria-labelledby="votes-title"><p className="eyebrow">OFFICIAL VOTES</p><h2 id="votes-title">Action timeline</h2><p className="disclaimer"><span className="demo-badge">{provenanceLabel(bill)}</span> Timeline entries and any vote totals must be confirmed against the official roll call.</p><div className="timeline">{votes.length ? votes.map((vote) => <div className="timeline-item" key={vote.stage}><span className={`timeline-dot ${vote.status.toLowerCase()}`}></span><div><div className="vote-stage"><strong>{vote.stage}</strong><span>{vote.status}</span></div><p>{vote.date} - {vote.result}</p></div></div>) : <p>No vote data is available in this fixture.</p>}</div><SourceLink href={bill.officialSource}>Verify votes on the official record</SourceLink></section>;
 }
 
-function ImpactSnapshot({ bill }: { bill: Bill }) {
-  const fiscal = bill.detail?.fiscal;
-  return <section className="detail-card fiscal-card" aria-labelledby="fiscal-title"><p className="eyebrow">OFFICIAL FISCAL NOTE</p><h2 id="fiscal-title">Impact snapshot</h2><div className="fiscal-values"><div><span>State cost</span><strong>{fiscal?.stateCost ?? 'Unavailable'}</strong></div><div><span>Local cost</span><strong>{fiscal?.localCost ?? 'Unavailable'}</strong></div></div><p>{fiscal?.note ?? 'No fiscal information is available.'}</p><SourceLink href={fiscal?.sourceUrl ?? bill.officialSource}>Review official sources for fiscal notes</SourceLink></section>;
-}
-
-function Historical({ bill }: { bill: Bill }) {
-  const historical = bill.detail?.historical;
-  return <section className="detail-card historical-card"><p className="eyebrow">HISTORICAL CONTEXT</p><h2>{historical?.title ?? 'Related prior-bill comparison'}</h2><p>{historical?.description ?? 'No verified historical comparison is available.'}</p><SourceLink href={historical?.sourceUrl ?? bill.officialSource}>Review official sources</SourceLink></section>;
-}
-
 export function BillDetail({ slug }: { slug: string }) {
   const { bill, persona, setPersona, personas, personaImpact, dataNotice } = useBillDetail(slug);
   if (!bill) return <main className="not-found"><a className="back-link" href="/">Back to dashboard</a><p className="eyebrow">BILL NOT FOUND</p><h1>We couldn't find that bill.</h1><p>Try returning to the dashboard and selecting one of the available demo bills.</p></main>;
 
-  return <><SiteHeader activePage="" /><main className="detail-page"><p className="disclaimer" role="status">{dataNotice}</p><DetailHeader bill={bill} /><div className="detail-grid"><div className="detail-primary"><OfficialActivity bill={bill} /><Translator bill={bill} /><Votes bill={bill} /><ImpactSnapshot bill={bill} /><Historical bill={bill} /></div><aside className="detail-rail"><PersonalImpact bill={bill} personas={personas} persona={persona} setPersona={setPersona} personaImpact={personaImpact} /><ImpactSimulator bill={bill} /></aside></div></main></>;
+  return <><SiteHeader activePage="" /><main className="detail-page"><p className="disclaimer" role="status">{dataNotice}</p><DetailHeader bill={bill} /><div className="detail-grid"><div className="detail-primary"><OfficialActivity bill={bill} /><Translator bill={bill} /><Votes bill={bill} /></div><aside className="detail-rail"><PersonalImpact bill={bill} personas={personas} persona={persona} setPersona={setPersona} personaImpact={personaImpact} /><ImpactSimulator bill={bill} /></aside></div></main></>;
 }
