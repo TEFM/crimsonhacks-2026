@@ -1,6 +1,11 @@
-import type { Bill, BillSeed } from './bills.js';
+export interface BillSearchRecord {
+  id: string;
+  title: string;
+  sponsor: string;
+  topic: string;
+}
 
-export function filterBills(bills: readonly (Bill | BillSeed)[], topic: string, query: string) {
+export function filterBills<T extends BillSearchRecord>(bills: readonly T[], topic: string, query: string): T[] {
   const normalizedQuery = typeof query === 'string' ? query.trim().toLowerCase() : '';
   return bills.filter((bill) => {
     const matchesTopic = topic === 'All bills' || bill.topic === topic;
