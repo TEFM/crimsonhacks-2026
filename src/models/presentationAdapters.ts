@@ -1,5 +1,5 @@
 import { bills, meetings, type Bill as BackendBill, type BillSeed, type Meeting as BackendMeeting } from './bills';
-import type { Bill, ImpactSimulatorData, Meeting, Vote } from './types';
+import type { Bill, BillDataOrigin, ImpactSimulatorData, Meeting, Vote } from './types';
 
 const OFFICIAL_UTAH_LEGISLATURE_URL = 'https://le.utah.gov/';
 
@@ -35,6 +35,17 @@ function sourceUrl(...values: unknown[]): string {
     } catch { /* Use the next existing source. */ }
   }
   return OFFICIAL_UTAH_LEGISLATURE_URL;
+}
+
+function dataOrigin(value: unknown, sourceStatus: unknown): BillDataOrigin {
+  if (value === 'official-snapshot') return value;
+  // A server-side official record can be safely presented as a cached source snapshot,
+  // but unknown/malformed records remain prototype fixtures.
+  return text(sourceStatus) === 'Official Utah Legislature API' ? 'official-snapshot' : 'prototype-fixture';
+}
+
+function capturedAt(value: unknown): string | undefined {
+  return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : undefined;
 }
 
 function personaImpacts(value: unknown): Record<string, string> {
@@ -95,6 +106,8 @@ export function toBillViewModel(bill: BillSeed | BackendBill): Bill {
     votes: text(seed.votes, 'Vote information unavailable'),
     initials: text(seed.initials, initialsFor(sponsor)),
     officialSource,
+    dataOrigin: dataOrigin(seed.dataOrigin, seed.sourceStatus),
+    capturedAt: capturedAt(seed.capturedAt),
     detail: {
       latestAction: text(detail.latestAction, fixtureVotes[0]?.result ?? 'Latest action is unavailable in this cached fixture.'),
       nextEvent: text(detail.nextEvent, text(seed.hearing, 'No upcoming meeting is available.')),

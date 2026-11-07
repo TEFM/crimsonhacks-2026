@@ -49,7 +49,7 @@ test('bill detail includes effective date in the translator, official verificati
   assert.match(translator, /Verify explanation and timing against official text/);
   assert.match(translator, /not legal or financial advice/);
   assert.match(source, /id="personal-impact"/);
-  assert.match(source, /Activity below is an unverified prototype preview/);
-  assert.match(source, /Timeline entries and any vote totals are unverified prototype data/);
+  assert.match(source, /Activity may be out of date/);
+  assert.match(source, /must be confirmed against the official roll call/);
   assert.match(source, /Review official sources for fiscal notes/);
 });

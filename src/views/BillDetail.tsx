@@ -10,6 +10,12 @@ function SourceLink({ href, children = 'View official source' }: { href: string;
   return <a className="source-link" href={href} target="_blank" rel="noreferrer">{children} <ArrowIcon /></a>;
 }
 
+function provenanceLabel(bill: Bill): string {
+  return bill.dataOrigin === 'official-snapshot'
+    ? `Official-source snapshot${bill.capturedAt ? ` - captured ${bill.capturedAt}` : ''}`
+    : 'Prototype fixture';
+}
+
 function DetailHeader({ bill }: { bill: Bill }) {
   return <header className="detail-header">
     <a className="back-link" href="/">Back to dashboard</a>
@@ -17,7 +23,7 @@ function DetailHeader({ bill }: { bill: Bill }) {
     <p className="eyebrow">UTAH LEGISLATURE - 2026 SESSION</p>
     <h1>{bill.title}</h1>
     <p className="detail-sponsor">Sponsored by {bill.sponsor}</p>
-    <div className="detail-actions"><SourceLink href={bill.officialSource}>{bill.detail?.sourceLabel ?? 'Official Utah Legislature bill record'}</SourceLink><span>Last updated: fixture data</span></div>
+    <div className="detail-actions"><span className="fixture-badge">{provenanceLabel(bill)}</span><SourceLink href={bill.officialSource}>{bill.detail?.sourceLabel ?? 'Official Utah Legislature bill record'}</SourceLink><span>Last updated: {bill.updated}</span></div>
   </header>;
 }
 
@@ -25,7 +31,7 @@ function OfficialActivity({ bill }: { bill: Bill }) {
   const detail = bill.detail;
   return <section className="detail-card activity-card" aria-labelledby="activity-title">
     <p className="eyebrow">OFFICIAL ACTIVITY</p><h2 id="activity-title">Where it stands</h2>
-    <p className="disclaimer"><span className="demo-badge">Demo fixture</span> Activity below is an unverified prototype preview. Confirm status and scheduling on the official legislative record.</p>
+    <p className="disclaimer"><span className="demo-badge">{provenanceLabel(bill)}</span> Activity may be out of date. Confirm status and scheduling on the official legislative record.</p>
     <div className="activity-row"><span>Latest action</span><strong>{detail?.latestAction ?? 'Latest action is unavailable in this fixture.'}</strong></div>
     <div className="activity-row"><span>Next event</span><strong>{detail?.nextEvent ?? 'No upcoming meeting is available.'}</strong></div>
     <SourceLink href={bill.officialSource}>Open official bill record</SourceLink>
@@ -35,7 +41,7 @@ function OfficialActivity({ bill }: { bill: Bill }) {
 function Translator({ bill }: { bill: Bill }) {
   const detail = bill.detail;
   return <section className="detail-card translator-card" aria-labelledby="translation-title">
-    <div className="card-title-row"><div><p className="eyebrow">AI-ASSISTED EXPLANATION</p><h2 id="translation-title">In plain language</h2></div><span className="demo-badge">Demo fixture</span></div>
+    <div className="card-title-row"><div><p className="eyebrow">AI-ASSISTED EXPLANATION</p><h2 id="translation-title">In plain language</h2></div><span className="demo-badge">{provenanceLabel(bill)}</span></div>
     <p className="plain-summary">{detail?.plainSummary ?? 'A plain-language explanation is not available for this bill yet.'}</p>
     <div className="law-change"><h3>Current law to proposed change</h3>{detail?.currentVsProposed?.length ? detail.currentVsProposed.map(([label, description]) => <div className="change-row" key={label}><strong>{label}</strong><p>{description}</p></div>) : <p>Comparison unavailable.</p>}</div>
     <div className="affected"><h3>Who may be affected</h3><div>{detail?.affectedGroups?.length ? detail.affectedGroups.map((group) => <span key={group}>{group}</span>) : <span>Not yet specified</span>}</div></div>
@@ -56,7 +62,7 @@ function PersonalImpact({ bill, personas, persona, setPersona, personaImpact }: 
 
 function Votes({ bill }: { bill: Bill }) {
   const votes = bill.detail?.votes ?? [];
-  return <section className="detail-card votes-card" aria-labelledby="votes-title"><p className="eyebrow">OFFICIAL VOTES</p><h2 id="votes-title">Action timeline</h2><p className="disclaimer"><span className="demo-badge">Demo fixture</span> Timeline entries and any vote totals are unverified prototype data. The official roll call controls.</p><div className="timeline">{votes.length ? votes.map((vote) => <div className="timeline-item" key={vote.stage}><span className={`timeline-dot ${vote.status.toLowerCase()}`}></span><div><div className="vote-stage"><strong>{vote.stage}</strong><span>{vote.status}</span></div><p>{vote.date} - {vote.result}</p></div></div>) : <p>No vote data is available in this fixture.</p>}</div><SourceLink href={bill.officialSource}>Verify votes on the official record</SourceLink></section>;
+  return <section className="detail-card votes-card" aria-labelledby="votes-title"><p className="eyebrow">OFFICIAL VOTES</p><h2 id="votes-title">Action timeline</h2><p className="disclaimer"><span className="demo-badge">{provenanceLabel(bill)}</span> Timeline entries and any vote totals must be confirmed against the official roll call.</p><div className="timeline">{votes.length ? votes.map((vote) => <div className="timeline-item" key={vote.stage}><span className={`timeline-dot ${vote.status.toLowerCase()}`}></span><div><div className="vote-stage"><strong>{vote.stage}</strong><span>{vote.status}</span></div><p>{vote.date} - {vote.result}</p></div></div>) : <p>No vote data is available in this fixture.</p>}</div><SourceLink href={bill.officialSource}>Verify votes on the official record</SourceLink></section>;
 }
 
 function ImpactSnapshot({ bill }: { bill: Bill }) {
@@ -70,8 +76,8 @@ function Historical({ bill }: { bill: Bill }) {
 }
 
 export function BillDetail({ slug }: { slug: string }) {
-  const { bill, persona, setPersona, personas, personaImpact } = useBillDetail(slug);
+  const { bill, persona, setPersona, personas, personaImpact, dataNotice } = useBillDetail(slug);
   if (!bill) return <main className="not-found"><a className="back-link" href="/">Back to dashboard</a><p className="eyebrow">BILL NOT FOUND</p><h1>We couldn't find that bill.</h1><p>Try returning to the dashboard and selecting one of the available demo bills.</p></main>;
 
-  return <><SiteHeader activePage="" /><main className="detail-page"><DetailHeader bill={bill} /><div className="detail-grid"><div className="detail-primary"><OfficialActivity bill={bill} /><Translator bill={bill} /><Votes bill={bill} /><ImpactSnapshot bill={bill} /><Historical bill={bill} /></div><aside className="detail-rail"><PersonalImpact bill={bill} personas={personas} persona={persona} setPersona={setPersona} personaImpact={personaImpact} /><ImpactSimulator bill={bill} /></aside></div></main></>;
+  return <><SiteHeader activePage="" /><main className="detail-page"><p className="disclaimer" role="status">{dataNotice}</p><DetailHeader bill={bill} /><div className="detail-grid"><div className="detail-primary"><OfficialActivity bill={bill} /><Translator bill={bill} /><Votes bill={bill} /><ImpactSnapshot bill={bill} /><Historical bill={bill} /></div><aside className="detail-rail"><PersonalImpact bill={bill} personas={personas} persona={persona} setPersona={setPersona} personaImpact={personaImpact} /><ImpactSimulator bill={bill} /></aside></div></main></>;
 }

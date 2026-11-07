@@ -41,6 +41,7 @@ test('dashboard renders the complete fixture list, working CTA destinations, sch
   assert.match(html, /aria-controls="bill-list"/);
   assert.match(html, /href="\/bills\/hb-218#personal-impact"/);
   assert.match(html, /PROTOTYPE SCHEDULE/);
+  assert.match(html, /Showing bundled prototype fixtures. Live legislative data is not requested in this deployment./);
   assert.match(html, /3 bills/);
   assert.match(html, /civic-information prototype/);
 });
@@ -52,14 +53,33 @@ test('every direct fixture bill renders with sources and disclosures; unknown bi
     assert.match(html, /href="https:\/\/le.utah.gov\/"/);
     assert.match(html, /AI-ASSISTED EXPLANATION/);
     assert.match(html, /not legal or financial advice/);
-    assert.match(html, /Activity below is an unverified prototype preview/);
-    assert.match(html, /Timeline entries and any vote totals are unverified prototype data/);
+    assert.match(html, /Prototype fixture/);
+    assert.match(html, /Activity may be out of date/);
+    assert.match(html, /must be confirmed against the official roll call/);
     assert.match(html, /When could it begin\?/);
   }
   const unknown = renderBill('not-a-bill');
   assert.match(unknown, /BILL NOT FOUND/);
   assert.match(unknown, /href="\/"/);
   assert.doesNotMatch(unknown, /Household impact simulator/);
+});
+
+test('official-source snapshots retain a validated capture date and visibly distinct provenance', () => {
+  const snapshot = toBillViewModel({
+    id: 'HB 777', slug: 'hb-777', title: 'Verified snapshot', topic: 'Housing',
+    dataOrigin: 'official-snapshot', capturedAt: '2026-02-10', officialSourceUrl: 'https://le.utah.gov/',
+    sourceStatus: 'Official Utah Legislature snapshot'
+  });
+  assert.equal(snapshot.dataOrigin, 'official-snapshot');
+  assert.equal(snapshot.capturedAt, '2026-02-10');
+  withTemporaryBill({
+    id: 'HB 777', slug: 'hb-777', title: 'Verified snapshot', topic: 'Housing',
+    dataOrigin: 'official-snapshot', capturedAt: '2026-02-10', officialSourceUrl: 'https://le.utah.gov/'
+  }, () => {
+    const html = renderBill('hb-777');
+    assert.match(html, /Official-source snapshot - captured 2026-02-10/);
+    assert.match(html, /href="https:\/\/le\.utah\.gov\/"/);
+  });
 });
 
 test('every meeting route renders agenda links and provenance; unknown agenda renders recovery', () => {

@@ -23,8 +23,11 @@ export interface BillDetailData {
 export interface Bill {
   id: string; slug?: string; title: string; topic: string; sponsor: string; status: string;
   statusTone: BillStatusTone; summary: string; hearing: string; updated: string; votes: string;
-  initials: string; officialSource: string; detail?: BillDetailData;
+  initials: string; officialSource: string; dataOrigin: BillDataOrigin; capturedAt?: string; detail?: BillDetailData;
 }
+
+/** Provenance is displayed with every cached record; it is never inferred from generated text. */
+export type BillDataOrigin = 'prototype-fixture' | 'official-snapshot';
 
 export interface FixtureFiscalNote { stateCost: string; localCost: string; sourceUrl: string | null; }
 export interface FixtureExplanation { plainSummary: string; currentVsProposed: string; affectedGroups: string; effectiveDate: string; uncertainties: string; }
@@ -34,6 +37,7 @@ export interface BillSeed {
   statusTone?: BillStatusTone; summary?: string; hearing?: string; updated?: string; votes?: string;
   initials?: string; officialSourceUrl?: string | null; officialTextUrl?: string | null;
   sourceStatus?: string; explanation?: FixtureExplanation | string; personas?: Record<string, string>;
+  dataOrigin?: BillDataOrigin; capturedAt?: string;
   timeline?: readonly FixtureTimelineEvent[];
   historicalEffect?: { title: string; detail: string; sourceUrl: string | null } | null;
   simulator?: { annualProgramCost: number; affectedHouseholds: number; assumptions: string } | null;
