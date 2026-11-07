@@ -89,8 +89,8 @@ Landing dashboard
 
 ## Technical approach
 
-- **Frontend:** Use **React + Vite** for the single-page interface.
-- **Runtime/tooling:** Use **Node.js + npm** for local development, builds, and backend functions.
+- **Frontend:** Use **React + Vite + TypeScript** for the single-page interface. Use `.ts` and `.tsx` files for application code rather than JavaScript files.
+- **Runtime/tooling:** Use **Node.js + npm** for local development, builds, and TypeScript-compatible backend functions.
 - **Styling:** Use Tailwind CSS only if the team already knows it; otherwise use a simple component/CSS approach to protect build time.
 - **Data:** Start with local JSON fixtures; optionally connect to Utah Legislature JSON feeds.
 - **AI translation:** Ask for structured fields: `plain_summary`, `current_vs_proposed`, `affected_groups`, `personalized_impact`, `uncertainties`, and `source_citations`.
@@ -99,9 +99,9 @@ Landing dashboard
 
 ### React and Node.js implementation choice
 
-React + Vite is the preferred frontend because it is quick to build, easy to demo as a dashboard, and deploys cleanly as a static single-page app. Node.js powers the Vite build process and should also be used for any protected server-side work.
+React + Vite + TypeScript is the preferred frontend because it is quick to build, easy to demo as a dashboard, provides safer fixture/API contracts, and deploys cleanly as a static single-page app. Node.js powers the Vite build process and should also be used for any protected server-side work.
 
-Start with a frontend-only app using seeded bill fixtures. Add a Node.js serverless function/API only for AI translation, private API tokens, or live-data transformation. Do not build a separate always-running Express server during the hackathon unless the team already has it working.
+Start with a frontend-only TypeScript app using seeded bill fixtures. Define shared types for bills, votes, meetings, fiscal notes, translator output, persona impacts, and simulator assumptions. Add a Node.js serverless function/API only for AI translation, private API tokens, or live-data transformation. Do not build a separate always-running Express server during the hackathon unless the team already has it working.
 
 ### MVC structure
 
@@ -115,11 +115,11 @@ Suggested project layout:
 
 ```text
 src/
-  models/          # Types, fixtures, and data services
-  controllers/     # UI/action logic and API client orchestration
-  views/           # Pages and presentational React components
-  components/      # Reusable UI elements
-  services/        # Shared API/AI/source-link helpers
+  models/          # TypeScript domain types, fixtures, and data services
+  controllers/     # TypeScript UI/action logic and API client orchestration
+  views/           # `.tsx` pages and presentational React components
+  components/      # Reusable `.tsx` UI elements
+  services/        # Shared TypeScript API/AI/source-link helpers
 amplify/           # Optional Node.js serverless functions and Amplify backend
 ```
 
