@@ -16,7 +16,7 @@ function DetailHeader({ bill }: { bill: Bill }) {
     <p className="eyebrow">UTAH LEGISLATURE · 2026 SESSION</p>
     <h1>{bill.title}</h1>
     <p className="detail-sponsor">Sponsored by {bill.sponsor}</p>
-    <div className="detail-actions"><SourceLink href={bill.officialSource}>{bill.detail?.sourceLabel ?? 'Official Utah Legislature bill record'}</SourceLink><span>Last updated: fixture data</span></div>
+    <div className="detail-actions"><SourceLink href={bill.officialSource}>{bill.detail?.sourceLabel ?? 'Official Utah Legislature bill record'}</SourceLink><span>Last updated: {bill.updated}</span></div>
   </header>;
 }
 
@@ -65,8 +65,8 @@ function Historical({ bill }: { bill: Bill }) {
 }
 
 export function BillDetail({ slug }: { slug: string }) {
-  const { bill, persona, setPersona, personas, personaImpact } = useBillDetail(slug);
+  const { bill, persona, setPersona, personas, personaImpact, dataNotice, isLoading } = useBillDetail(slug);
   if (!bill) return <main className="not-found"><a className="back-link" href="/">← Back to dashboard</a><p className="eyebrow">BILL NOT FOUND</p><h1>We couldn’t find that bill.</h1><p>Try returning to the dashboard and selecting one of the available demo bills.</p></main>;
 
-  return <><SiteHeader activePage="" /><main className="detail-page"><DetailHeader bill={bill} /><div className="detail-grid"><div className="detail-primary"><OfficialActivity bill={bill} /><Translator bill={bill} /><Votes bill={bill} /></div><aside className="detail-rail"><PersonalImpact bill={bill} personas={personas} persona={persona} setPersona={setPersona} personaImpact={personaImpact} /><ImpactSimulator bill={bill} /><ImpactSnapshot bill={bill} /><Historical bill={bill} /></aside></div></main></>;
+  return <><SiteHeader activePage="" /><main className="detail-page">{dataNotice ? <p role="status">{isLoading ? 'Loading live bill data. ' : ''}{dataNotice}</p> : null}<DetailHeader bill={bill} /><div className="detail-grid"><div className="detail-primary"><OfficialActivity bill={bill} /><Translator bill={bill} /><Votes bill={bill} /></div><aside className="detail-rail"><PersonalImpact bill={bill} personas={personas} persona={persona} setPersona={setPersona} personaImpact={personaImpact} /><ImpactSimulator bill={bill} /><ImpactSnapshot bill={bill} /><Historical bill={bill} /></aside></div></main></>;
 }

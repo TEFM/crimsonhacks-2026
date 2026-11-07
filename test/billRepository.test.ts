@@ -76,7 +76,9 @@ test('repository decodes direct-link bill IDs and does not expose invalid record
 test('bill API returns a record for a direct bill request and 404 for an unknown bill', async () => {
   const found = await handler({ pathParameters: { id: 'HB%20218' } });
   assert.equal(found.statusCode, 200);
-  assert.equal(JSON.parse(found.body).data.id, 'HB 218');
+  const foundBody = JSON.parse(found.body);
+  assert.equal(foundBody.data.id, 'HB 218');
+  assert.equal(foundBody.meta.source, 'cached-demo-fixture');
 
   const missing = await handler({ pathParameters: { id: 'SB%20999' } });
   assert.equal(missing.statusCode, 404);

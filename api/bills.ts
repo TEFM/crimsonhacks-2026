@@ -63,7 +63,9 @@ export async function handler(event: LambdaEvent = {}) {
 
   if (id) {
     const bill = billRepository.findById(id);
-    return bill ? response(200, { data: bill }) : response(404, { error: 'Bill not found.' });
+    return bill
+      ? response(200, { data: bill, meta: { source: 'cached-demo-fixture', generatedAt: new Date().toISOString() } })
+      : response(404, { error: 'Bill not found.' });
   }
 
   return response(200, {

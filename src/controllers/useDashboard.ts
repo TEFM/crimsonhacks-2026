@@ -17,7 +17,9 @@ export function useDashboard() {
     fetchBills().then((result) => {
       if (!active) return;
       setLoadedBills(result.bills);
-      setDataNotice(result.source === 'official-utah-legislature-api' ? null : result.notice ?? 'Official API unavailable; showing cached demo fixtures.');
+      setDataNotice(result.source === 'official-utah-legislature-api'
+        ? 'Showing records from the official Utah Legislature API.'
+        : result.notice ?? 'Official API unavailable; showing cached demo fixtures.');
     }).catch(() => {
       if (active) setDataNotice('Live bill data is unavailable; showing cached demo fixtures.');
     }).finally(() => {
