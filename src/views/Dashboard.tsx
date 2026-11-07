@@ -6,7 +6,7 @@ import { ArrowIcon } from '../components/ArrowIcon';
 import type { Bill, Meeting } from '../models/types';
 
 function SearchIcon() { return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4.2 4.2" /></svg>; }
-function BillCard({ bill }: { bill: Bill }) { return <article className="bill-card"><div className="bill-topline"><span className="bill-id">{bill.id}</span><span className={`status ${bill.statusTone}`}>{bill.status}</span></div><h3>{bill.title}</h3><p>{bill.summary}</p><div className="bill-footer"><div className="sponsor"><span className="avatar">{bill.initials}</span><span>{bill.sponsor}</span></div><a className="card-link" href={`/bills/${bill.slug}`}>View brief <ArrowIcon /></a></div><div className="bill-meta"><span>{bill.hearing}</span><span>{bill.votes}</span></div></article>; }
+function BillCard({ bill }: { bill: Bill }) { const detailHref = bill.slug ? `/bills/${bill.slug}` : null; return <article className="bill-card"><div className="bill-topline"><span className="bill-id">{bill.id}</span><span className={`status ${bill.statusTone}`}>{bill.status}</span></div><h3>{bill.title}</h3><p>{bill.summary}</p><div className="bill-footer"><div className="sponsor"><span className="avatar">{bill.initials}</span><span>{bill.sponsor}</span></div>{detailHref ? <a className="card-link" href={detailHref}>View brief <ArrowIcon /></a> : <span className="card-link">Brief unavailable</span>}</div><div className="bill-meta"><span>{bill.hearing}</span><span>{bill.votes}</span></div></article>; }
 function MeetingCard({ meeting }: { meeting: Meeting }) {
   const scheduledBill = meeting?.scheduledBills?.[0];
   const label = meeting.timing ? meetingTimingLabels[meeting.timing] : 'Upcoming';

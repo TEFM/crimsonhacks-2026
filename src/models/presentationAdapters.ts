@@ -23,7 +23,7 @@ export function toBillViewModel(bill: BillSeed): Bill {
   const explanation = typeof bill.explanation === 'string' ? bill.explanation : bill.explanation?.plainSummary;
   return {
     id: bill.id,
-    slug: slugifyBillId(bill.id),
+    slug: bill.slug ?? slugifyBillId(bill.id),
     title: bill.title,
     topic: bill.topic,
     sponsor: bill.sponsor ?? 'Sponsor not available',
@@ -66,7 +66,8 @@ export function toBillViewModel(bill: BillSeed): Bill {
         title: bill.historicalEffect.title,
         description: bill.historicalEffect.detail,
         sourceUrl: bill.historicalEffect.sourceUrl ?? bill.officialSourceUrl ?? OFFICIAL_UTAH_LEGISLATURE_URL
-      } : undefined
+      } : undefined,
+      ...bill.detail
     }
   };
 }

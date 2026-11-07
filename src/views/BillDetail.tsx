@@ -35,8 +35,8 @@ function Translator({ bill }: { bill: Bill }) {
   return <section className="detail-card translator-card" aria-labelledby="translation-title">
     <div className="card-title-row"><div><p className="eyebrow">AI-ASSISTED EXPLANATION</p><h2 id="translation-title">In plain language</h2></div><span className="demo-badge">Demo fixture</span></div>
     <p className="plain-summary">{detail?.plainSummary ?? 'A plain-language explanation is not available for this bill yet.'}</p>
-    <div className="law-change"><h3>Current law → proposed change</h3>{detail?.currentVsProposed?.map(([label, description]) => <div className="change-row" key={label}><strong>{label}</strong><p>{description}</p></div>) ?? <p>Comparison unavailable.</p>}</div>
-    <div className="affected"><h3>Who may be affected</h3><div>{detail?.affectedGroups?.map((group) => <span key={group}>{group}</span>) ?? <span>Not yet specified</span>}</div></div>
+    <div className="law-change"><h3>Current law → proposed change</h3>{detail?.currentVsProposed?.length ? detail.currentVsProposed.map(([label, description]) => <div className="change-row" key={label}><strong>{label}</strong><p>{description}</p></div>) : <p>Comparison unavailable.</p>}</div>
+    <div className="affected"><h3>Who may be affected</h3><div>{detail?.affectedGroups?.length ? detail.affectedGroups.map((group) => <span key={group}>{group}</span>) : <span>Not yet specified</span>}</div></div>
     <p className="disclaimer">AI-assisted explanation for demonstration only. It is not legal or financial advice. Verify details against the official bill text and record.</p>
   </section>;
 }
@@ -51,7 +51,8 @@ function PersonalImpact({ bill, personas, persona, setPersona, personaImpact }: 
 }
 
 function Votes({ bill }: { bill: Bill }) {
-  return <section className="detail-card votes-card" aria-labelledby="votes-title"><p className="eyebrow">OFFICIAL VOTES</p><h2 id="votes-title">Action timeline</h2><div className="timeline">{bill.detail?.votes?.map((vote) => <div className="timeline-item" key={vote.stage}><span className={`timeline-dot ${vote.status.toLowerCase()}`}></span><div><div className="vote-stage"><strong>{vote.stage}</strong><span>{vote.status}</span></div><p>{vote.date} · {vote.result}</p></div></div>) ?? <p>No vote data is available in this fixture.</p>}</div><SourceLink href={bill.officialSource}>Verify votes on the official record</SourceLink></section>;
+  const votes = bill.detail?.votes ?? [];
+  return <section className="detail-card votes-card" aria-labelledby="votes-title"><p className="eyebrow">OFFICIAL VOTES</p><h2 id="votes-title">Action timeline</h2><div className="timeline">{votes.length ? votes.map((vote) => <div className="timeline-item" key={vote.stage}><span className={`timeline-dot ${vote.status.toLowerCase()}`}></span><div><div className="vote-stage"><strong>{vote.stage}</strong><span>{vote.status}</span></div><p>{vote.date} · {vote.result}</p></div></div>) : <p>No vote data is available in this fixture.</p>}</div><SourceLink href={bill.officialSource}>Verify votes on the official record</SourceLink></section>;
 }
 
 function ImpactSnapshot({ bill }: { bill: Bill }) {
