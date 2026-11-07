@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { findBillBySlug, getPersonaImpact } from '../src/models/billDetail.js';
+import { billIdFromSlug, findBillBySlug, getPersonaImpact } from '../src/models/billDetail.js';
 import { calculateAnnualHouseholdImpact, formatCurrency } from '../src/models/impactSimulator.js';
 import { toBillViewModels } from '../src/models/presentationAdapters.js';
 
@@ -33,6 +33,11 @@ test('remaining dashboard fixture slugs resolve and unknown routes safely miss',
 
 test('bill detail provides a safe fallback for an unavailable persona explanation', () => {
   assert.match(getPersonaImpact(null, 'Renter'), /not available/i);
+});
+
+test('bill-detail URLs map only valid bill slugs to API bill IDs', () => {
+  assert.equal(billIdFromSlug('hb-0218'), 'HB 218');
+  assert.equal(billIdFromSlug('not-a-bill'), null);
 });
 
 test('impact simulator divides fixture costs across affected households', () => {

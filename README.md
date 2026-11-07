@@ -32,6 +32,17 @@ The endpoint is ready to use the official Utah Legislature developer service whe
 
 ## Amplify Hosting
 
+This repository includes an Amplify Gen 2 HTTP API configuration. The Amplify build deploys a `bills-api` Lambda and public GET-only API Gateway routes at `/api/bills` and `/api/bills/{id}`, then builds the Vite app into `dist`.
+
+### One-time Amplify configuration
+
+1. In Amplify Console, set `UTAH_LEGISLATURE_DEVELOPER_TOKEN` in **Hosting > Secrets**, not Environment variables. It is injected into the Lambda only at runtime.
+2. Optionally set the non-secret `UTAH_LEGISLATURE_SESSION` environment variable to `2026GS` (the default).
+3. Deploy the branch. The backend deployment output includes `custom.billsApi.endpoint`.
+4. Add a non-secret branch environment variable named `VITE_BILLS_API_URL` with that endpoint value, then redeploy. This public API Gateway URL is the only API configuration sent to the browser; the Utah token stays in Lambda.
+
+When `VITE_BILLS_API_URL` is missing or the API fails, the dashboard safely uses visibly labeled demo fixtures. Do not add a `VITE_` prefix to the Utah developer token.
+
 `amplify.yml` builds the Vite app with `npm ci` and publishes `dist`. Keep any future API or AI credentials in Amplify environment variables, never in the client or a committed `.env` file.
 
 Connect this repository and branch in Amplify Hosting and use the checked-in build settings. No environment variables are required for the fixture-only frontend. In Hosting → Rewrites and redirects, configure a **200 rewrite** to `/index.html` for SPA paths (including `/bills/<slug>` and `/meetings/<slug>`), preserving static asset requests. Refresh those direct URLs after deployment to verify the hosting rule; Vite's local SPA fallback alone does not verify the deployed Amplify configuration.

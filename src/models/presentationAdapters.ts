@@ -1,4 +1,4 @@
-import { bills, meetings, type BillSeed, type Meeting as BackendMeeting } from './bills';
+import { bills, meetings, type Bill as BackendBill, type BillSeed, type Meeting as BackendMeeting } from './bills';
 import type { Bill, ImpactSimulatorData, Meeting, Vote } from './types';
 
 const OFFICIAL_UTAH_LEGISLATURE_URL = 'https://le.utah.gov/';
@@ -65,7 +65,7 @@ function simulatorData(value: unknown, fiscalSource: string): ImpactSimulatorDat
 }
 
 /** Validate optional fixture fields before supplying plain text and safe links to React. */
-export function toBillViewModel(bill: BillSeed): Bill {
+export function toBillViewModel(bill: BillSeed | BackendBill): Bill {
   const seed = record(bill);
   const detail = record(seed.detail);
   const explanation = record(seed.explanation);
@@ -121,7 +121,7 @@ export function toBillViewModel(bill: BillSeed): Bill {
   };
 }
 
-export function toBillViewModels(records: readonly BillSeed[] = bills): Bill[] {
+export function toBillViewModels(records: readonly (BillSeed | BackendBill)[] = bills): Bill[] {
   return records.map(toBillViewModel);
 }
 
