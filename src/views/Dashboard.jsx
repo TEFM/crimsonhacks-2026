@@ -1,5 +1,6 @@
 import { meetings } from '../models/bills';
 import { useDashboard } from '../controllers/useDashboard';
+import utahStateFlag from '../assets/utah-state-flag.svg';
 
 function Mark() {
   return <div className="mark" aria-hidden="true"><span></span><span></span><span></span></div>;
@@ -47,7 +48,10 @@ export function Dashboard() {
   return (
     <main>
       <header className="topbar">
-        <a className="brand" href="#top" aria-label="Beehive Brief home"><Mark /><span>Beehive<br /><b>Brief</b></span></a>
+        <div className="brand-lockup">
+          <a className="brand" href="#top" aria-label="Beehive Brief home"><Mark /><span>Beehive<br /><b>Brief</b></span></a>
+          <img className="state-flag" src={utahStateFlag} alt="Utah state flag" />
+        </div>
         <nav aria-label="Main navigation"><a className="active" href="#top">Dashboard</a><a href="#meetings">Meetings</a><a href="#about">About</a></nav>
         <button className="location" type="button"><span className="pin">⌖</span> Salt Lake County <span className="chevron">⌄</span></button>
       </header>
